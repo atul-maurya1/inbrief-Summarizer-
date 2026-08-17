@@ -1,0 +1,233 @@
+import ProfilePic from "../components/ProfilePic";
+import { MdOutlineContentPaste } from "react-icons/md";
+import { FaFilePdf } from "react-icons/fa";
+import { IoIosLink } from "react-icons/io";
+import { FaVideo } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
+import { FaRegCopy } from "react-icons/fa6";
+import { MdOutlineFileDownload } from "react-icons/md";
+import { MdMessage } from "react-icons/md";
+
+import { useState } from "react";
+
+import TextArea from "../components/TextArea";
+import InputPDF from "../components/InputPDF";
+import InputLink from "../components/InputLink";
+import InputYTLink from "../components/InputYTLink";
+import InputVideo from "../components/InputVideo";
+import AskAI from "../components/AksAI";
+
+const Summarizer = () => {
+	const [inputText, setInputText] = useState("Text");
+    const [isChatOpen, setChatOpen] = useState(false)
+
+	return (
+		<>
+			<div>
+				<div className=" hidden p-5 bg-white border-b-2 border-b-gray-200 lg:flex justify-between items-center px-5 ">
+					<h1 className="text-xl text-gray-700 font-medium">
+						Summarizer Content in a Minutes
+					</h1>
+					<ProfilePic />
+				</div>
+
+				<div className="w-full min-h-[700px] flex flex-col lg:flex-row gap-2">
+					<div
+						id="input"
+						className="w-full lg:w-1/2 rounded-2xl border border-slate-200 bg-white 
+                        shadow-sm overflow-hidden"
+					>
+						<div className="px-6 py-5">
+							<div className="flex items-center gap-3">
+								<div
+									className="w-10 h-10 rounded-xl bg-blue-50
+                                    flex items-center justify-center"
+								>
+									<MdOutlineContentPaste
+										size={22}
+										className="text-blue-600 dark:text-blue-400"
+									/>
+								</div>
+
+								<div>
+									<h1 className="text-md font-semibold text-gray-700">
+										Add your content
+									</h1>
+									<p className="text-sm text-gray-600">
+										Choose an input type and add your content
+									</p>
+								</div>
+							</div>
+						</div>
+
+						{/* Input Area */}
+						<div className="py-5 px-2">
+							<div className="flex flex-col sm:flex-row gap-3 w-full md:flex-wrap">
+								<button
+									onClick={() => setInputText("Text")}
+									className={`w-full sm:flex-1 flex items-center justify-center
+                                     px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
+                                     ${
+																				inputText === "Text"
+																					? "border-blue-500 bg-blue-50"
+																					: "bg-white border-slate-200"
+																			}
+                                     `}
+								>
+									<MdOutlineContentPaste size={22} color="blue" />
+									<span className="text-sm font-medium">Text</span>
+								</button>
+
+								<button
+									onClick={() => setInputText("PDF")}
+									className={`w-full sm:flex-1 flex items-center justify-center
+                                     px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
+                                     ${
+																				inputText === "PDF"
+																					? "border-blue-500 bg-blue-50"
+																					: "bg-white border-slate-200"
+																			}
+                                     `}
+								>
+									<FaFilePdf size={22} color="green" />
+									<span className="text-sm font-medium">PDF</span>
+								</button>
+
+								<button
+									onClick={() => setInputText("Link")}
+									className={`w-full sm:flex-1 flex items-center justify-center
+                                     px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
+                                     ${
+																				inputText === "Link"
+																					? "border-blue-500 bg-blue-50"
+																					: "bg-white border-slate-200"
+																			}
+                                     `}
+								>
+									<IoIosLink size={22} color="red" />
+									<span className="text-sm font-medium">Link</span>
+								</button>
+
+								<button
+									onClick={() => setInputText("Video")}
+									className={`w-full sm:flex-1 flex items-center justify-center
+                                     px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
+                                     ${
+																				inputText === "Video"
+																					? "border-blue-500 bg-blue-50"
+																					: "bg-white border-slate-200"
+																			}
+                                     `}
+								>
+									<FaVideo size={22} color="blue" />
+									<span className="text-sm font-medium">Video</span>
+								</button>
+
+								<button
+									onClick={() => setInputText("Youtube")}
+									className={`w-full sm:flex-1 flex items-center justify-center
+                                     px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
+                                     ${
+																				inputText === "Youtube"
+																					? "border-blue-500 bg-blue-50"
+																					: "bg-white border-slate-200"
+																			}
+                                     `}
+								>
+									<FaYoutube size={22} color={"red"} />
+									<span className="text-sm font-medium">Youtube</span>
+								</button>
+							</div>
+
+							{/* Text Input */}
+							{inputText === "Text" && <TextArea />}
+							{inputText === "PDF" && <InputPDF />}
+							{inputText === "Link" && <InputLink />}
+							{inputText === "Youtube" && <InputYTLink />}
+							{inputText === "Video" && <InputVideo />}
+						</div>
+					</div>
+
+					<div
+						id="output"
+						className="w-full min-h-[700px] lg:w-1/2 rounded-2xl border border-slate-200
+                        bg-white
+                        shadow-sm overflow-hidden "
+					>
+						<div className="bg-white h-20 w-full flex justify-between items-center p-5 border-b border-gray-200">
+							<p className="text-xl text-gray-700 font-semibold">Summery</p>
+							<div className="flex gap-2">
+								<button className="px-3 py-1 border-2 rounded-sm flex  items-center gap-1 border-gray-200 text-gray-600">
+									{" "}
+									<FaRegCopy /> Copy
+								</button>
+								<button className="px-3 py-1 border-2 rounded-sm flex  items-center gap-1 border-gray-200 text-gray-600">
+									{" "}
+									<MdOutlineFileDownload /> Download
+								</button>
+							</div>
+						</div>
+						<div className="h-[500px] p-5 overflow-y-auto border-b-2 border-gray-200">
+							<p className="text-md text-gray-700 leading-7 whitespace-pre-wrap">
+								Your Summery appears here...</p>
+						</div>
+
+						<div className="px-2 py-4">
+							<div
+								className="w-full rounded-xl border border-blue-200
+                                bg-gradient-to-r from-blue-50 to-indigo-50
+                                p-2 sm:p-5"
+							>
+								<div
+									className="flex flex-col sm:flex-row
+                                        items-start sm:items-center
+                                        justify-between gap-4"
+								>
+				
+									<div className="flex items-center gap-3">
+										<div
+											className="w-10 h-10 shrink-0
+                                            flex items-center justify-center
+                                            rounded-lg bg-blue-600 text-white"
+										>
+											<MdMessage size={20} />
+										</div>
+
+										<div>
+											<p className="text-sm sm:text-base font-semibold text-gray-800">
+												Ask AI anything about your content
+											</p>
+
+											<p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+												Get answers, explanations, and insights instantly.
+											</p>
+										</div>
+									</div>
+
+									<button 
+                                       onClick={() => setChatOpen(true)}
+										className="w-full sm:w-auto
+                                                px-4 py-2.5
+                                                rounded-lg
+                                                bg-blue-600 hover:bg-blue-700
+                                                text-white text-sm font-medium
+                                                flex items-center justify-center gap-2
+                                                transition duration-200
+                                                shadow-sm"
+									>
+										<MdMessage size={18} />
+										Open AI Chat
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                     {isChatOpen && <AskAI setChatOpen={setChatOpen}/>  }
+
+				</div>
+			</div>
+		</>
+	);
+};
+export default Summarizer;
