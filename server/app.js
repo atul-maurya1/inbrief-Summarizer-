@@ -9,10 +9,11 @@ import ChatToAIRoutes from './routes/ChatToAI.routes.js'
 
 import connectDB from './config/db.config.js'
 import authRouter from './routes/auth.routes.js'
+import summarizerRouter from './routes/summarizer.routes.js'
 
 const app = express()
 
-app.use(express.json({limit: '10kb'}))
+app.use(express.json())
 app.use(cookieParser({limit: "20kb"}))
 app.use(express.urlencoded({extended: true, limit: '10kb'}))
 app.use(halmet())
@@ -31,8 +32,10 @@ app.get("/", (req, res) => {
 })
 
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/summarizer', summarizerRouter)
 
 app.use('/api', ChatToAIRoutes)
+
 
 
 const PORT = process.env.PORT
