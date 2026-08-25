@@ -1,8 +1,20 @@
 import { FaFilePdf } from "react-icons/fa";
+import {useState} from "react"
 
 const InputPDF = () => {
+
+	const [file, setFile] = useState(null)
+
+	const handleSubmit = (e) => {
+		e.preventDefault()
+         console.log(e)
+		
+		 console.log("file is" ,file)
+	}
+
 	return (
 		<>
+		<form onSubmit={handleSubmit} >
         <div className="w-full py-9">
 			<label
 				htmlFor="pdf-upload"
@@ -23,11 +35,11 @@ const InputPDF = () => {
 
 				{/* Text */}
 				<h3 className="text-sm sm:text-base font-semibold text-slate-700">
-					Upload your PDF
+					{file ? file.name : "Upload your PDF"}
 				</h3>
 
 				<p className="mt-1 text-xs sm:text-sm text-slate-400 text-center">
-					Click to browse or drag and drop your file here
+					{file ? "PDF Uploader Successfully": "Click to browse or drag and drop your file here"}
 				</p>
 
 				<span
@@ -41,23 +53,28 @@ const InputPDF = () => {
 				<p className="mt-3 text-xs text-slate-400">PDF files only</p>
 
 				{/* Actual input */}
+				
 				<input
 					id="pdf-upload"
 					type="file"
 					accept=".pdf,application/pdf"
 					className="hidden"
+					onChange={(e) => setFile(e.target.files[0])}
 				/>
+				
 			</label>
 		</div>
         <div className="py-5" >
-				<button
+				<button type="submit"
 					className="px-5 w-full py-2.5 rounded-xl bg-blue-600 
                              hover:bg-blue-700 text-white text-sm 
                              font-medium transition shadow-sm"
 				>
 					Summarizer with AI
 				</button>
+				
 			</div>
+			</form>
         </>
 	);
 };

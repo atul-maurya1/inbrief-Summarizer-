@@ -6,8 +6,8 @@ import { AIsummarizer } from "../ai/gemini.services.js"
 const textServices = async (text) => {
     try{    
         const splitter = new RecursiveCharacterTextSplitter({  
-        chunkSize: 1000, // Maximum characters per chunk
-        chunkOverlap: 100, // reuse around 100 characters from the previous chunk.
+        chunkSize: 3000, // Maximum characters per chunk
+        chunkOverlap: 300, // reuse around 100 characters from the previous chunk.
      });
                  
     const chunks = await splitter.splitText(text);
@@ -16,6 +16,7 @@ const textServices = async (text) => {
     }catch(err){
 
         console.error("error in text service ", err)
+        throw err
         
     }
 }

@@ -3,6 +3,7 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiRespone.js";
 import textServices  from "../services/extraction/text.services.js"
 import {extractTextFromPdf} from "../services/extraction/pdf.services.js"
+import {urlService} from '../services/extraction/url.services.js'
 
 export const summarizeContent  = async (req, res, next) => {
     try {
@@ -19,6 +20,7 @@ export const summarizeContent  = async (req, res, next) => {
 		}
 		else if (url) {
 				console.log("url");
+                response = await urlService(url)
 		}
 
 		if (req.file) {

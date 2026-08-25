@@ -19,7 +19,7 @@ import AskAI from "../components/AksAI";
 
 const Summarizer = () => {
 	const [inputText, setInputText] = useState("Text");
-    const [isChatOpen, setChatOpen] = useState(false)
+	const [isChatOpen, setChatOpen] = useState(false);
 
 	return (
 		<>
@@ -169,7 +169,8 @@ const Summarizer = () => {
 						</div>
 						<div className="h-[500px] p-5 overflow-y-auto border-b-2 border-gray-200">
 							<p className="text-md text-gray-700 leading-7 whitespace-pre-wrap">
-								Your Summery appears here...</p>
+								Your Summery appears here...
+							</p>
 						</div>
 
 						<div className="px-2 py-4">
@@ -183,7 +184,6 @@ const Summarizer = () => {
                                         items-start sm:items-center
                                         justify-between gap-4"
 								>
-				
 									<div className="flex items-center gap-3">
 										<div
 											className="w-10 h-10 shrink-0
@@ -204,8 +204,8 @@ const Summarizer = () => {
 										</div>
 									</div>
 
-									<button 
-                                       onClick={() => setChatOpen(true)}
+									<button
+										onClick={() => setChatOpen(true)}
 										className="w-full sm:w-auto
                                                 px-4 py-2.5
                                                 rounded-lg
@@ -223,8 +223,7 @@ const Summarizer = () => {
 						</div>
 					</div>
 
-                     {isChatOpen && <AskAI setChatOpen={setChatOpen}/>  }
-
+					{isChatOpen && <AskAI setChatOpen={setChatOpen} />}
 				</div>
 			</div>
 		</>
