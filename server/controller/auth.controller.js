@@ -1,6 +1,7 @@
 import ApiError from '../utils/apiError.js'
 import ApiResponse from '../utils/apiRespone.js'
 import User from "../models/user.model.js"
+import bcrypt from 'bcrypt'
 
 const cookiesOptions = {
     httpOnly: true,
@@ -78,4 +79,53 @@ export const userRegister = async (req, res, next) => {
     }
     
 
+}
+
+
+export const userLogin = async(req, res, next) => {
+    try{
+
+        const {email , password} = req.body
+        if(!email || !password){
+            throw new ApiError(400, "all fields are required")
+        }
+
+        const isExists = await User.findOne({email: email})
+        if(!isExists){
+            throw new ApiError(400, "email is not register")
+        }
+
+        const isPasswordCorrect = bcrypt.compare(password, isExists.password)
+        if(!isPasswordCorrect){
+            throw new ApiError(400, "incorrect Password")
+        }
+
+        const {accessToken, refreshToken} = await generateAccessTokenAndRrefreshToken(isExists._id)
+
+        console.log(accessToken)
+        
+        res.cookie( "accessToken", accessToken, cookiesOptions)
+        res.cookie( "refreshToken", refreshToken, cookiesOptions)
+
+        res.status(201).json(
+            new ApiResponse(201, isExists, "user register successfully")
+        )
+
+
+    }
+    catch(err){
+        console.log("error while user login ", err)
+        if(err instanceof ApiError){
+            next(err)
+        }
+        throw new ApiError(500 ,"Internal server error")
+    }
+}
+
+export const userLogout = async(req, res, next) =>{
+    try{
+
+    }catch(e){
+        
+    }
 }

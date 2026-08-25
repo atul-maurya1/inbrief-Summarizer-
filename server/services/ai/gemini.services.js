@@ -1,9 +1,10 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+// import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
 
-
-export const AIsummarizer = async (text) => {
+export const AIsummarizer = async (chunks) => {
 	try {
+	
 		const summarySchema = z.object({
 			title: z.string(),
 			summary: z.string(),
@@ -34,7 +35,7 @@ export const AIsummarizer = async (text) => {
             1. Identify the main topic and purpose of the content.
             2. Generate a concise and accurate summary.
             3. Extract the most important key points.
-            4. Extract relevant keywords.
+            4. Extract most relevant 5 keywords.
             5. Preserve important names, dates, numbers, facts and technical terms.
             6. Remove repetition, filler and unnecessary information.
             7. Maintain the original meaning and context.
@@ -65,28 +66,62 @@ export const AIsummarizer = async (text) => {
             Return the result strictly according to the structured output schema.
             `;
 		const model = new ChatGoogleGenerativeAI({
-			model: "gemini-2.5-flash",
+			 model: "gemini-3.5-flash", 
+           
 		});
 
-		const structuredModel  = await model.withStructuredOutput(summarySchema)
-		const response = await structuredModel.invoke([
-            {
-                role: "system",
-                content: systemPrompt,
-            },
-            {
-                role: "user",
-                content: text,
-            },
-        ]);
- 
-        return response
+		
+		const structuredModel = await model.withStructuredOutput(summarySchema);
 
-	} catch (e) {
-         console.error("error while model-running ", err)
-         return res.status(500).json({
-            suucess: false,
-            message:  "Internal server errror"
-         })
+		let finalSummery
+		if(chunks.length === 1){
+				console.log("chunks 1 ", chunks)
+		    finalSummery =  await structuredModel.invoke([
+			 {
+				role: "system",
+				content: systemPrompt,
+			 },
+			 {
+				role: "user",
+				content: chunks[0],
+			 },
+		]); 
+
+		}else{	
+		  const chunkSummaries = [];
+ console.log("chunks 2 ", chunks)
+		  for (const chunk of chunks) {
+			const response = await structuredModel.invoke([
+				{
+					role: "system",
+					content: systemPrompt,
+				},
+				{
+					role: "user",
+					content: chunk,
+				},
+			]);
+			//console.log(response)
+			chunkSummaries.push(response.summary);
+		}
+
+		const combinedSummary = chunkSummaries.join("\n\n");
+	    finalSummery = await structuredModel.invoke([
+			{
+				role: "system",
+				content: systemPrompt,
+			},
+			{
+				role: "user",
+				content: combinedSummary,
+			},
+		]);
+
+		}
+
+		return finalSummery;
+
+	} catch (err) {
+		console.error("error while model-running ", err);
 	}
 };

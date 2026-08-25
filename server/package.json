@@ -1,11 +1,13 @@
 {
   "dependencies": {
+    "@langchain/community": "^1.1.29",
     "@langchain/core": "^1.2.9",
     "@langchain/google-genai": "^2.2.0",
+    "@langchain/openai": "^1.5.10",
     "@langchain/textsplitters": "^1.0.1",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
-    "dotenv": "^17.4.2",
+    "dotenv": "^16.4.5",
     "express": "^5.2.1",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.6.2",
@@ -14,6 +16,8 @@
     "jsonwebtoken": "^9.0.3",
     "langchain": "^1.5.9",
     "mongoose": "^9.9.2",
+    "multer": "^2.2.0",
+    "pdf-parse": "^2.4.5",
     "zod": "^4.4.3"
   },
   "name": "server",
