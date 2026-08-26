@@ -10,6 +10,7 @@ import ChatToAIRoutes from './routes/ChatToAI.routes.js'
 import connectDB from './config/db.config.js'
 import authRouter from './routes/auth.routes.js'
 import summarizerRouter from './routes/summarizer.routes.js'
+import healthRouter from './routes/health.routes.js'
 
 const app = express()
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/summarizer', summarizerRouter)
+app.use('/api/v1', healthRouter)
 
 app.use('/api', ChatToAIRoutes)
 

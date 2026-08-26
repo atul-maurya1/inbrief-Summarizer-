@@ -1,6 +1,7 @@
 //import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 // import { ChatOpenAI } from "@langchain/openai";
 
+import ApiError from "../../utils/apiError.js"
 import { ChatGroq } from "@langchain/groq";
 import { z } from "zod";
 
@@ -218,7 +219,11 @@ export const AIsummarizer = async (chunks) => {
 		return finalSummery;
 
 	} catch (err) {
-		console.error("error while model-running ", err);
+		//console.error("error while model-running ", err);
+		  if (err.status === 429) {
+			//throw new ApiError(429, "Model rate limit reached. Please retry.")
+             return "Groq Model rate limit reached. Please retry after some time.";
+    }
 		 throw err;
 	} 
 };

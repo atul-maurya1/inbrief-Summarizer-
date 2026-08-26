@@ -8,17 +8,19 @@ import {urlService} from '../services/extraction/url.services.js'
 export const summarizeContent  = async (req, res, next) => {
     try {
 		const { text, url } = req.body;
+
+        console.log(req.body)
       
         if (!text && !url && !req.file) { // Check whether ANY input exists
             throw new ApiError(400, "Please provide an input");
         }
 
-        let response
+        let response    
 		if (text) {
 			 console.log("text");
-             response =  await textServices(text)
+             response =  await textServices(text)  
 		}
-		else if (url) {
+	    if (url) { 
 				console.log("url");
                 response = await urlService(url)
 		}

@@ -2,6 +2,7 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import Firecrawl from "@mendable/firecrawl-js";
 import { AIsummarizer } from "../ai/gemini.services.js"
+import ApiError from '../../utils/apiError.js'
 
 export const urlService = async (url) => {
     try{
@@ -12,7 +13,7 @@ export const urlService = async (url) => {
             formats: ["markdown"],
     });
     
-    console.log(result.markdown)
+    //console.log(result.markdown)
 
      const splitter = new RecursiveCharacterTextSplitter({
         chunkSize: 3000, 
@@ -24,7 +25,14 @@ export const urlService = async (url) => {
      return await AIsummarizer(chunks) 
     
     }catch(err){
-        console.error("error in url service ", err) 
+       // console.error("error in url service ", err) 
         throw err
+
+         console.error(
+            "Error while summarizing:",
+            err
+        );
+        
+
     } 
 }   
