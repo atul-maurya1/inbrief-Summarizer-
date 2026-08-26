@@ -26,10 +26,9 @@ import {SummeryContext} from "../context/summeryContext"
 const Summarizer = () => {
 	const [inputText, setInputText] = useState("Text");
 	const [isChatOpen, setChatOpen] = useState(false);
-	const {summery, loading} = useContext(SummeryContext)
+	const {summery, loading, error} = useContext(SummeryContext)
 
-	console.log("summery is ",  summery)
-	console.log("loading ", loading)
+//	console.log("error " , error)
 
 	return (
 		<>
@@ -104,7 +103,7 @@ const Summarizer = () => {
 								</button>
 
 								<button
-									onClick={() => setInputText("Link")}
+									onClick={() =>{ setInputText("Link"),  summery("")}}
 									className={`w-full sm:flex-1 flex items-center justify-center
                                      px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
                                      ${
@@ -150,7 +149,7 @@ const Summarizer = () => {
 							</div>
 
 							{/* Text Input */}
-							{inputText === "Text" && <TextArea />}
+							{inputText === "Text" && <TextArea /> }
 							{inputText === "PDF" && <InputPDF />}
 							{inputText === "Link" && <InputLink />}
 							{inputText === "Youtube" && <InputYTLink />}

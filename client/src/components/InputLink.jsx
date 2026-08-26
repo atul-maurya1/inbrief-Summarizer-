@@ -1,9 +1,23 @@
 import { IoIosLink } from "react-icons/io";
+import {useContext, useState} from "react"
+import {SummeryContext} from "../context/summeryContext"
+import { PiSpinnerGapBold } from "react-icons/pi";
+
 
 
 const InputLink = () => {
 
-  
+  const {fetchSummery, loading} = useContext(SummeryContext)
+  const [url, setUrl] = useState("")
+
+  function handleOnClick () {
+   // e.preventDefault()
+    if(url === "") return
+    console.log("url", url)
+    fetchSummery("url", url)
+
+  }
+
   return (
     <div className="w-full py-10">
       <div
@@ -37,6 +51,8 @@ const InputLink = () => {
           />
 
           <input
+            value={url}
+            onChange={(e) =>setUrl(e.target.value)}
             type="url"
             placeholder="https://youtube.com/watch?v=..."
             className="w-full h-12 pl-10 pr-4
@@ -52,6 +68,7 @@ const InputLink = () => {
 
      <div className="py-5">
            <button
+           onClick={handleOnClick}
           type="button"
           className="w-full mt-4 h-12
                      rounded-xl bg-blue-600
@@ -59,7 +76,13 @@ const InputLink = () => {
                      text-white text-sm font-medium
                      transition"
         >
-          Add Link
+            {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        Summarizing <PiSpinnerGapBold className="animate-spin" />
+                      </span>
+                    ) : (
+                      "Summarizer with AI"
+                    )}
         </button>
      </div>
 

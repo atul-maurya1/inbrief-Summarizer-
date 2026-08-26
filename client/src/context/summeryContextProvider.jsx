@@ -9,16 +9,18 @@ const SummeryContextProvider = ({children}) => {
 	const [loading, setLoading] = useState(false);
     const [error , setError] = useState("")
 
-    const fetchSummery = async (text = "" , pdf = null, url = "", vedio = "") => {
+    const fetchSummery = async (inputType, value) => {
         setLoading(true)
           try{
           
-            const formData = new FormData()
+             const formData = new FormData();
 
-            if (text) formData.append("text", text)
-            if (pdf) formData.append("file", pdf)
-            if (url) formData.append("url", url)
-            if (vedio) formData.append("vedio", vedio)
+             //formData.append("type", value);
+
+            if (inputType === "text") formData.append("text", value)
+            if (inputType === "pdf") formData.append("file", value)
+            if (inputType === "url") formData.append("url", value)
+            if (inputType === "vedio") formData.append("vedio", value)
 
             const res = await axios.post('http://localhost:8000/api/v1/summarizer/summarize-content', formData)
             setSummery(res.data.data)

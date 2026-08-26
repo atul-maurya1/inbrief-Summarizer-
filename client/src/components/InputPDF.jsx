@@ -11,7 +11,7 @@ const InputPDF = () => {
 	
 	 const handleSubmit =  (e) => {
 		 e.preventDefault()
-		 fetchSummery("", pdf)
+		 fetchSummery("pdf", pdf)
        
 	}
 

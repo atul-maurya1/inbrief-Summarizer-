@@ -8,10 +8,11 @@ const {fetchSummery, loading} = useContext(SummeryContext)
 const [text, setText] = useState("")
 
 	function handleOnClick(){
-		fetchSummery(text)
+		if(text ==="") return
+		fetchSummery("text", text)
 
    }
-	return (
+	return ( 
 		<>
 			<div className="text-sm font-medium text-slate-700  bg-gray-100 mt-5 py-3 px-5 flex justify-between border border-gray-300 rounded-t-xl">
 				<span className="text-gray-700">Enter or paste your text</span>{" "}
@@ -21,6 +22,7 @@ const [text, setText] = useState("")
 			<textarea
 			    onChange={(e) => setText(e.target.value)}
 				value={text}
+				type="text"
 				placeholder="Paste or type your content here..."
 				className="w-full h-90 resize-none rounded-b-xl border 
                             border-gray-300
