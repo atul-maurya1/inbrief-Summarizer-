@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser"
 import halmet from "helmet"
 import rateLimiter from "express-rate-limit"
 import hpp from "hpp"
-import mongoSanitize from "express-mongo-sanitize"
+import cors from "cors"
 import ChatToAIRoutes from './routes/ChatToAI.routes.js'
 
 import connectDB from './config/db.config.js'
@@ -25,6 +25,13 @@ app.use(rateLimiter({
      message: "Too many request, please try again later"
 }))
 
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173"
+    ],
+  })
+);
 
 
 app.get("/", (req, res) => {

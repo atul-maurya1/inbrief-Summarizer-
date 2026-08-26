@@ -1,15 +1,18 @@
 import { FaFilePdf } from "react-icons/fa";
-import {useState} from "react"
+import {useContext, useState} from "react"
+import {SummeryContext} from "../context/summeryContext"
+import { PiSpinnerGapBold } from "react-icons/pi";
 
 const InputPDF = () => {
 
-	const [file, setFile] = useState(null)
+	 const [pdf, setPDF] = useState(null);
 
-	const handleSubmit = (e) => {
-		e.preventDefault()
-         console.log(e)
-		
-		 console.log("file is" ,file)
+	const {fetchSummery, loading} = useContext(SummeryContext)
+	
+	 const handleSubmit =  (e) => {
+		 e.preventDefault()
+		 fetchSummery("", pdf)
+       
 	}
 
 	return (
@@ -35,13 +38,13 @@ const InputPDF = () => {
 
 				{/* Text */}
 				<h3 className="text-sm sm:text-base font-semibold text-slate-700">
-					{file ? file.name : "Upload your PDF"}
+					{pdf ? pdf.name : "Upload your PDF"}
 				</h3>
 
 				<p className="mt-1 text-xs sm:text-sm text-slate-400 text-center">
-					{file ? "PDF Uploader Successfully": "Click to browse or drag and drop your file here"}
+					{pdf ? "PDF Uploader Successfully": "Click to browse or drag and drop your file here"}
 				</p>
-
+ 
 				<span
 					className="mt-3 px-4 py-2 rounded-lg
                      bg-blue-600 text-white text-sm font-medium
@@ -59,7 +62,7 @@ const InputPDF = () => {
 					type="file"
 					accept=".pdf,application/pdf"
 					className="hidden"
-					onChange={(e) => setFile(e.target.files[0])}
+					onChange={(e) => setPDF(e.target.files[0])}
 				/>
 				
 			</label>
@@ -70,7 +73,13 @@ const InputPDF = () => {
                              hover:bg-blue-700 text-white text-sm 
                              font-medium transition shadow-sm"
 				>
-					Summarizer with AI
+					{loading ? (
+						<span className="flex items-center justify-center gap-2">
+							Summarizing <PiSpinnerGapBold className="animate-spin" />
+						</span>
+					) : (
+						"Summarizer with AI"
+					)}
 				</button>
 				
 			</div>

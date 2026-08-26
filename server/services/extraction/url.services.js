@@ -12,7 +12,7 @@ export const urlService = async (url) => {
             formats: ["markdown"],
     });
     
- //    console.log(typeof result.markdown)
+    console.log(result.markdown)
 
      const splitter = new RecursiveCharacterTextSplitter({
         chunkSize: 3000, 
@@ -20,11 +20,11 @@ export const urlService = async (url) => {
      })
 
      const chunks = await splitter.splitText(result.markdown)
-    
-     return await AIsummarizer(chunks)
+     
+     return await AIsummarizer(chunks) 
     
     }catch(err){
-        console.error("error in url service ", err)
+        console.error("error in url service ", err) 
         throw err
-    }
-} 
+    } 
+}   

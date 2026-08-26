@@ -7,6 +7,7 @@ import { FaYoutube } from "react-icons/fa";
 import { FaRegCopy } from "react-icons/fa6";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { MdMessage } from "react-icons/md";
+import { MdAutoAwesome, MdInfoOutline } from "react-icons/md";
 
 import { useState } from "react";
 
@@ -17,9 +18,18 @@ import InputYTLink from "../components/InputYTLink";
 import InputVideo from "../components/InputVideo";
 import AskAI from "../components/AksAI";
 
+import {useContext} from "react"
+
+import {SummeryContext} from "../context/summeryContext"
+
+
 const Summarizer = () => {
 	const [inputText, setInputText] = useState("Text");
 	const [isChatOpen, setChatOpen] = useState(false);
+	const {summery, loading} = useContext(SummeryContext)
+
+	console.log("summery is ",  summery)
+	console.log("loading ", loading)
 
 	return (
 		<>
@@ -128,9 +138,9 @@ const Summarizer = () => {
 									className={`w-full sm:flex-1 flex items-center justify-center
                                      px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
                                      ${
-																				inputText === "Youtube"
-																					? "border-blue-500 bg-blue-50"
-																					: "bg-white border-slate-200"
+										inputText === "Youtube"
+										? "border-blue-500 bg-blue-50"
+										: "bg-white border-slate-200"
 																			}
                                      `}
 								>
@@ -168,9 +178,52 @@ const Summarizer = () => {
 							</div>
 						</div>
 						<div className="h-[500px] p-5 overflow-y-auto border-b-2 border-gray-200">
-							<p className="text-md text-gray-700 leading-7 whitespace-pre-wrap">
-								Your Summery appears here...
-							</p>
+							{loading ? (
+								<div className="h-full flex flex-col items-center justify-center gap-3 text-blue-600">
+									<div className="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin" />
+									<p className="text-sm font-medium">Creating your summary...</p>
+								</div>
+							) : summery ? (
+								<div className="space-y-3">
+									<div className="flex items-center gap-2 mb-4 text-blue-700">
+										<MdAutoAwesome size={20} />
+										<h2 className="font-semibold">
+											{typeof summery === "object" ? summery.title || "AI-generated summary" : "AI-generated summary"}
+										</h2>
+									</div>
+									<div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-md text-gray-700 leading-7 whitespace-pre-wrap">
+										{typeof summery === "object" ? summery.summary : summery}
+									</div>
+									{typeof summery === "object" && summery.keyPoints && (
+										<div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-gray-700">
+											<h3 className="font-semibold mb-2">Key points</h3>
+											{Array.isArray(summery.keyPoints) ? (
+												<ul className="list-disc pl-5 space-y-1">
+													{summery.keyPoints.map((point, index) => <li key={index}>{point}</li>)}
+												</ul>
+											) : <p className="whitespace-pre-wrap">{summery.keyPoints}</p>}
+										</div>
+									)}
+									{typeof summery === "object" && summery.keywords && (
+										<div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-gray-700">
+											<h3 className="font-semibold mb-2">Keywords</h3>
+											<div className="flex flex-wrap gap-2">
+												{(Array.isArray(summery.keywords) ? summery.keywords : [summery.keywords]).map((keyword, index) => (
+													<span key={index} className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">{keyword}</span>
+												))}
+											</div>
+										</div>
+									)}
+								</div>
+							) : (
+								<div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
+									<div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+										<MdInfoOutline size={28} />
+									</div>
+									<p className="font-medium text-gray-700">Your summary appears here</p>
+									<p className="text-sm mt-1">Add content on the left to get started.</p>
+								</div>
+							)}
 						</div>
 
 						<div className="px-2 py-4">
