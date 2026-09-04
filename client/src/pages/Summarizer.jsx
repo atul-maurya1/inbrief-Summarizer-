@@ -27,8 +27,39 @@ const Summarizer = () => {
 	const [inputText, setInputText] = useState("Text");
 	const [isChatOpen, setChatOpen] = useState(false);
 	const {summery, loading, error} = useContext(SummeryContext)
+	const [copied, setCopied] = useState(false)
 
 //	console.log("error " , error)
+
+   function copyToClipboard(){
+	if(summery){
+	let contentToCopy = "";
+	if (typeof summery === "object") {
+		// Title and main summary
+		contentToCopy += (summery.title ? summery.title + "\n\n" : "") + (summery.summary ? summery.summary + "\n\n" : "");
+
+		// Key Points
+		if (Array.isArray(summery.keyPoints) && summery.keyPoints.length > 0) {
+			contentToCopy += "Key Points:\n" + summery.keyPoints.map((kp, i) => `${i + 1}. ${kp}`).join("\n") + "\n\n";
+		}
+
+		// Keywords
+		if (Array.isArray(summery.keywords) && summery.keywords.length > 0) {
+			contentToCopy += "Keywords: " + summery.keywords.join(", ") + "\n";
+		}
+	} else {
+		contentToCopy = String(summery);
+	}
+	navigator.clipboard.writeText(contentToCopy);
+	setCopied(true)
+	setTimeout(() => {
+		setCopied(false)
+	}, 2000)
+	alert("Copied to clipboard")
+	}else{
+		alert("No content to copy")
+	}
+   }
 
 	return (
 		<>
@@ -166,12 +197,15 @@ const Summarizer = () => {
 						<div className="bg-white h-20 w-full flex justify-between items-center p-5 border-b border-gray-200">
 							<p className="text-xl text-gray-700 font-semibold">Summery</p>
 							<div className="flex gap-2">
-								<button className="px-3 py-1 border-2 rounded-sm flex  items-center gap-1 border-gray-200 text-gray-600">
-									{" "}
+								<button 
+								 onClick={() => copyToClipboard()}
+								 className={`px-3 py-1 border-2 rounded-sm flex items-center gap-1 border-gray-200 text-gray-600 ${summery ? "" : " opacity-50 cursor-not-allowed"}`}  disabled={!summery} >
+																										
 									<FaRegCopy /> Copy
+								
 								</button>
-								<button className="px-3 py-1 border-2 rounded-sm flex  items-center gap-1 border-gray-200 text-gray-600">
-									{" "}
+								<button  className={`px-3 py-1 border-2 rounded-sm flex items-center gap-1 border-gray-200 text-gray-600${summery ? "" : " opacity-50 cursor-not-allowed"}`} 
+								 disabled={!summery} >
 									<MdOutlineFileDownload /> Download
 								</button>
 							</div>

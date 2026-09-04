@@ -1,4 +1,4 @@
-import {useContext, useState} from "react"
+import {useContext, useState, useEffect} from "react"
 import {SummeryContext} from "../context/summeryContext"
 import { PiSpinnerGapBold } from "react-icons/pi";
 
@@ -6,21 +6,30 @@ import { PiSpinnerGapBold } from "react-icons/pi";
 const TextArea = () => {
 const {fetchSummery, loading} = useContext(SummeryContext)
 const [text, setText] = useState("")
+const [charCount, setCharCount] = useState(0)
 
 	function handleOnClick(){
 		if(text ==="") return
 		fetchSummery("text", text)
 
    }
+
+   useEffect(() => {
+	setCharCount(text.length)
+	// if(charCount > 10000){
+	// 	alert("Login Required to use the full features")
+	// }
+   }, [text])
+
 	return ( 
 		<>
 			<div className="text-sm font-medium text-slate-700  bg-gray-100 mt-5 py-3 px-5 flex justify-between border border-gray-300 rounded-t-xl">
 				<span className="text-gray-700">Enter or paste your text</span>{" "}
-				<button className="hover:text-blue-400">Clear</button>
+				<button onClick={() =>{text ? setText("") : ""}} className={`${text ? "hover:text-blue-400 cursor-pointer " : "opacity-50"} `}>Clear</button>
 			</div>
 
 			<textarea
-			    onChange={(e) => setText(e.target.value)}
+			    onChange={(e) => (setText(e.target.value))}
 				value={text}
 				type="text"
 				placeholder="Paste or type your content here..."
@@ -31,7 +40,7 @@ const [text, setText] = useState("")
 			/>
 
 			<div className="flex items-center justify-between py-4 px-2">
-				<span className="text-xs text-slate-400">0 characters</span>
+				<span className="text-sm text-slate-400">{charCount} Characters</span>
 			</div>
 
 			<div>
