@@ -1,16 +1,27 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Summarizer from './pages/Summarizer'
 import AIChat from "./pages/AIChat";
 import ChatLayout from "./layout/ChatLayout";
+import Auth from "./pages/Auth";
+import {useContext} from 'react'
+import {authContext} from './context/authContext'
+
+
 
 function App() {
+
+  const{ user } = useContext(authContext)
+
   return (
     <Routes>
-      <Route path="/" element={<ChatLayout />}>
-        <Route index element={<Navigate to="/summarizer" replace />} />
+      <Route path="/auth" element={user ? <Navigate to="/summarizer" replace /> : <Auth />} />
+
+      <Route path="/" element={user ? <ChatLayout /> : <Navigate to="/auth" replace />}>
         <Route path="summarizer" element={<Summarizer />} />
         <Route path="ai-chat" element={<AIChat />} />
       </Route>
+
+      <Route path="*" element={<Navigate to={user ? "/summarizer" : "/auth"} replace />} />
     </Routes>
   )
 }

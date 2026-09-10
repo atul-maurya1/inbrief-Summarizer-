@@ -23,7 +23,7 @@ const [charCount, setCharCount] = useState(0)
 
 	return ( 
 		<>
-			<div className="text-sm font-medium text-slate-700  bg-gray-100 mt-5 py-3 px-5 flex justify-between border border-gray-300 rounded-t-xl">
+			<div className="mt-5 flex justify-between rounded-t-lg border border-blue-100 bg-blue-50 px-5 py-3 text-sm font-medium text-slate-700">
 				<span className="text-gray-700">Enter or paste your text</span>{" "}
 				<button onClick={() =>{text ? setText("") : ""}} className={`${text ? "hover:text-blue-400 cursor-pointer " : "opacity-50"} `}>Clear</button>
 			</div>
@@ -33,7 +33,7 @@ const [charCount, setCharCount] = useState(0)
 				value={text}
 				type="text"
 				placeholder="Paste or type your content here..."
-				className="w-full h-90 resize-none rounded-b-xl border 
+				className="h-[clamp(180px,42vh,380px)] w-full resize-none rounded-b-xl border 
                             border-gray-300
                             bg-white p-3 placeholder:text-slate-400
                             outline-none focus:ring-1 focus:ring-blue-500/20 transition"
@@ -56,7 +56,7 @@ const [charCount, setCharCount] = useState(0)
 							Summarizing <PiSpinnerGapBold className="animate-spin" />
 						</span>
 					) : (
-						"Summarizer with AI"
+						"Summarize with AI"
 					)}
 				</button>
 			</div>

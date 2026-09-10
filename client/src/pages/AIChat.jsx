@@ -6,22 +6,22 @@ import { LuBotMessageSquare } from "react-icons/lu";
 const AIChat = () => {
 	return (
 		<div>
-			<div className=" hidden lg:flex justify-between px-7 py-4 border-b-2 border-gray-200">
+			<div className="hidden items-center justify-between border-b border-slate-200 bg-white px-7 py-4 lg:flex">
 				<div className="flex justify-center items-center gap-2 ">
 					<img width="90px" size={10} src={logo} alt="logo" />
-					<span className="text-lg font-semibold">AI Chat</span>
+					<span className="text-lg font-semibold tracking-tight text-slate-900">AI Chat</span>
 				</div>
 				<ProfilePic />
 			</div>
 
-			<div className="px-4 sm:px-6 lg:px-10 py-5">
+			<div className="px-4 py-6 sm:px-6 lg:px-10">
 				
 				<div className="h-145 overflow-y-auto space-y-5 pr-2">
 					{/* User Message */}
 					<div className="flex justify-end">
 						<div
 							className="max-w-[80%] sm:max-w-[70%]
-                   bg-blue-600 text-white
+																bg-blue-700 text-white
                    px-4 py-3
                    rounded-2xl rounded-tr-sm
                    shadow-sm"
@@ -46,7 +46,7 @@ const AIChat = () => {
 						{/* AI Response */}
 						<div
 							className="max-w-[80%] sm:max-w-[70%]
-                   bg-gray-100
+																border border-slate-200 bg-white
                    text-gray-700
                    px-4 py-3
                    rounded-2xl rounded-tl-sm"

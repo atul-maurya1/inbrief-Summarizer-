@@ -1,7 +1,7 @@
 //import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import Firecrawl from "@mendable/firecrawl-js";
-import { AIsummarizer } from "../ai/gemini.services.js"
+import { AIsummarizer } from "../ai/ai.services.js"
 import ApiError from '../../utils/apiError.js'
 
 export const urlService = async (url) => {

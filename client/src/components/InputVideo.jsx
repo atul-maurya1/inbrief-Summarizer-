@@ -5,14 +5,14 @@ const InputVideo = () => {
 		<div className="w-full py-10">
 			<div
 				className="w-full p-6 sm:p-8
-                   border-2 border-dashed border-slate-300
-                   rounded-2xl bg-slate-50
+				   border border-dashed border-blue-200
+				   rounded-xl bg-blue-50/40
                    hover:border-blue-400 transition"
 			>
 				<div
 					className="w-14 h-14 mx-auto mb-4
                      flex items-center justify-center
-                     rounded-xl bg-blue-50"
+					 rounded-xl border border-blue-100 bg-white shadow-sm"
 				>
 					<FaVideo size={28} className="text-blue-500" />
 				</div>

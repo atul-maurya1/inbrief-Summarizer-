@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import Sidebar from '../components/Sidebar'
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoClose } from "react-icons/io5";
@@ -7,6 +7,9 @@ import logo from '../assets/logo.png';
 import ProfilePic from "../components/ProfilePic";
 
 const ChatLayout = () => {
+
+    let user = null
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -14,16 +17,16 @@ const ChatLayout = () => {
     };
 
     return(
-        <div className="flex h-screen">
+        <div className="workspace-shell flex h-screen min-w-0 overflow-x-hidden bg-slate-50 text-slate-900">
         
-            <aside className="hidden lg:block w-72 shrink-0">
+            <aside className="hidden w-64 shrink-0 lg:block">
                 <Sidebar />
             </aside>
 
             
             {isSidebarOpen && (
                 <div 
-                    className="fixed inset-0 bg-opacity-50 lg:hidden z-40"
+                    className="fixed inset-0 z-40 bg-slate-950/30 backdrop-blur-sm lg:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -36,22 +39,22 @@ const ChatLayout = () => {
             </aside>
 
             {/* Main Content */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex min-w-0 flex-1 flex-col">
                 {/* Mobile Header */}
-                <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 p-4">
+                <div className="workspace-mobile-header flex items-center justify-between border-b border-slate-200 bg-white/90 p-4 backdrop-blur lg:hidden">
                     <button 
                         onClick={toggleSidebar}
-                        className="text-gray-700 hover:text-blue-600 transition flex items-center gap-5"
+                        className="flex items-center gap-5 text-slate-700 transition hover:text-blue-700"
                     >
                         <GiHamburgerMenu size={24} />
                         <div className="w-20" >
                             <img src={logo} alt="InBrief logo" />
                         </div>
                     </button>
-                    <ProfilePic/>
+                    {user ? <ProfilePic/> : "Login"}
                 </div>
 
-                <main className="flex-1 overflow-auto bg-gray-50">
+                <main className="workspace-main min-h-0 flex-1 overflow-auto bg-slate-50">
                     <Outlet />
                 </main>
             </div>

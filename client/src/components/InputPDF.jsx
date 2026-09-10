@@ -21,19 +21,19 @@ const InputPDF = () => {
         <div className="w-full py-9">
 			<label
 				htmlFor="pdf-upload"
-				className="flex flex-col items-center justify-center
+					className="flex flex-col items-center justify-center
                w-full min-h-48 px-6 py-8
-               border-2 border-dashed border-slate-300
-               rounded-2xl bg-slate-50
+					border border-dashed border-blue-200
+					rounded-xl bg-blue-50/40
                hover:bg-slate-100 hover:border-blue-400
                cursor-pointer transition-all duration-200"
 			>
 				{/* Icon */}
 				<div
 					className="w-14 h-14 mb-4 flex items-center justify-center
-                    rounded-xl bg-red-50"
+					rounded-xl border border-blue-100 bg-white shadow-sm"
 				>
-					<FaFilePdf size={28} className="text-red-500" />
+					<FaFilePdf size={28} className="text-blue-700" />
 				</div>
 
 				{/* Text */}
@@ -78,7 +78,7 @@ const InputPDF = () => {
 							Summarizing <PiSpinnerGapBold className="animate-spin" />
 						</span>
 					) : (
-						"Summarizer with AI"
+						"Summarize with AI"
 					)}
 				</button>
 				

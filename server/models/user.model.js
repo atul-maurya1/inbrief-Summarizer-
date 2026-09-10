@@ -26,15 +26,18 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "password required"],
         minlength: [6, "password must be atleast 6 character long"],
-        select: false
+       // select: false
     },
     userType: {
         type: String,
         enum: ["FREE", "BASIC", "PREMIUM"],
         default: "FREE"
     },
-    refreshToken: String, 
-    
+    refreshToken: { 
+      type:  String, 
+     // select: false
+    }
+      
 
 }, {timestamps: true})
 
@@ -52,6 +55,11 @@ userSchema.methods.generateRefreshToken = async function(){
      {expiresIn:process.env.REFRESH_TOKEN_EXPIRY}
  )
 } 
+
+userSchema.methods.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password)
+}
+
 userSchema.methods.generateAccessToken = async function () {
     return jwt.sign({
         id: this._id,

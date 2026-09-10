@@ -5,16 +5,16 @@ const InputYTLink = () => {
 		<div className="w-full py-10">
 			<div
 				className="w-full p-6 sm:p-8
-                   border-2 border-dashed border-slate-300
-                   rounded-2xl bg-slate-50
-                   hover:border-red-400 transition"
+				   border border-dashed border-blue-200
+				   rounded-xl bg-blue-50/40
+				   hover:border-blue-400 transition"
 			>
 				<div
 					className="w-14 h-14 mx-auto mb-4
                      flex items-center justify-center
-                     rounded-xl bg-red-50"
+					 rounded-xl border border-blue-100 bg-white shadow-sm"
 				>
-					<FaYoutube size={30} className="text-red-500" />
+					<FaYoutube size={30} className="text-blue-700" />
 				</div>
 
 				<h3 className="text-base font-semibold text-slate-700 text-center">
@@ -30,7 +30,7 @@ const InputYTLink = () => {
 					<FaYoutube
 						size={20}
 						className="absolute left-3 top-1/2
-                       -translate-y-1/2 text-red-500"
+					   -translate-y-1/2 text-blue-600"
 					/>
 
 					<input
@@ -42,8 +42,8 @@ const InputYTLink = () => {
                        text-sm 
                        placeholder:text-slate-400
                        outline-none
-                       focus:border-red-500
-                       focus:ring-2 focus:ring-red-500/20"
+					   focus:border-blue-500
+					   focus:ring-2 focus:ring-blue-500/20"
 					/>
 				</div>
 
@@ -51,8 +51,8 @@ const InputYTLink = () => {
 					<button
 						type="button"
 						className="w-full mt-4 h-12
-                     rounded-xl bg-red-500
-                     hover:bg-red-600
+					 rounded-lg bg-blue-600
+					 hover:bg-blue-700
                      text-white text-sm font-medium
                      transition"
 					>

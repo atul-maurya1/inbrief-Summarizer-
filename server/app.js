@@ -26,13 +26,10 @@ app.use(rateLimiter({
      message: "Too many request, please try again later"
 }))
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173"
-    ],
-  })
-);
+app.use(cors({
+  origin: "http://localhost:5173",
+   credentials: true 
+}));
 
 
 app.get("/", (req, res) => {

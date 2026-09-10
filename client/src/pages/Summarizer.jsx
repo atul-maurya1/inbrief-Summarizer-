@@ -10,6 +10,7 @@ import { MdMessage } from "react-icons/md";
 import { MdAutoAwesome, MdInfoOutline } from "react-icons/md";
 import { jsPDF } from "jspdf";
 
+
 import { useState } from "react";
 
 import TextArea from "../components/TextArea";
@@ -22,6 +23,7 @@ import AskAI from "../components/AksAI";
 import { useContext } from "react"
 
 import { SummeryContext } from "../context/summeryContext"
+import {authContext} from '../context/authContext'
 
 
 const Summarizer = () => {
@@ -30,7 +32,8 @@ const Summarizer = () => {
 	const { summery, loading, error } = useContext(SummeryContext)
 	const [copied, setCopied] = useState(false)
 
-	//	console.log("error " , error)
+	const { user, logout } = useContext(authContext)
+	
 
 	
 	function copyToClipboard() {
@@ -218,20 +221,54 @@ const Summarizer = () => {
 
 	}
 
+	const [toggle, setToggle] = useState(false)
+
+	const toggleLogout = () => {
+		setToggle(!toggle)
+	}
+
+	const handleLogout = async () => {
+		await logout()
+	}
+
 	return (
 		<>
-			<div>
-				<div className=" hidden p-5 bg-white border-b-2 border-b-gray-200 lg:flex justify-between items-center px-5 ">
+			<div className="summarizer-page min-h-full min-w-0 overflow-visible lg:h-full lg:overflow-hidden">
+				<div className="hidden items-center justify-between border-b border-slate-200 bg-white p-5 lg:flex">
 					<h1 className="text-xl text-gray-700 font-medium">
-						Summarizer Content in a Minutes
+						Summarize content in minutes
 					</h1>
-					<ProfilePic />
+					<div className="relative">
+						<button
+							type="button"
+							onClick={toggleLogout}
+							aria-label="Open profile menu"
+							aria-expanded={toggle}
+							className="rounded-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						>
+							<ProfilePic />
+						</button >
+						{toggle && (
+							<div className="absolute right-0 top-14 z-20 w-44 overflow-hidden rounded-xl border border-slate-200 bg-white py-2 shadow-lg">
+								<div className="border-b border-slate-100 px-4 pb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+									Account
+								</div>
+								<button
+								    onClick = {handleLogout}
+									type="button"
+									className="flex w-full items-center px-4 py-3 text-left text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-600"
+								>
+									Logout
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
 
-				<div className="w-full min-h-[700px] flex flex-col lg:flex-row gap-2">
+				<div className="flex min-h-0 w-full min-w-0 flex-col gap-3 overflow-visible lg:h-[calc(100%-70px)] lg:flex-row lg:gap-2 lg:overflow-hidden">
 					<div
 						id="input"
-						className="w-full lg:w-1/2 rounded-2xl border border-slate-200 bg-white 
+						className="w-full rounded-xl border border-slate-200 bg-white shadow-md lg:w-1/2
                         shadow-sm overflow-hidden"
 					>
 						<div className="px-6 py-5">
@@ -270,7 +307,7 @@ const Summarizer = () => {
 										}
                                      `}
 								>
-									<MdOutlineContentPaste size={22} color="blue" />
+										<MdOutlineContentPaste size={22} className="text-blue-700" />
 									<span className="text-sm font-medium">Text</span>
 								</button>
 
@@ -284,7 +321,7 @@ const Summarizer = () => {
 										}
                                      `}
 								>
-									<FaFilePdf size={22} color="green" />
+										<FaFilePdf size={22} className="text-blue-700" />
 									<span className="text-sm font-medium">PDF</span>
 								</button>
 
@@ -298,7 +335,7 @@ const Summarizer = () => {
 										}
                                      `}
 								>
-									<IoIosLink size={22} color="red" />
+										<IoIosLink size={22} className="text-blue-600" />
 									<span className="text-sm font-medium">Link</span>
 								</button>
 
@@ -312,7 +349,7 @@ const Summarizer = () => {
 										}
                                      `}
 								>
-									<FaVideo size={22} color="blue" />
+										<FaVideo size={22} className="text-blue-700" />
 									<span className="text-sm font-medium">Video</span>
 								</button>
 
@@ -326,8 +363,8 @@ const Summarizer = () => {
 										}
                                      `}
 								>
-									<FaYoutube size={22} color={"red"} />
-									<span className="text-sm font-medium">Youtube</span>
+										<FaYoutube size={22} className="text-blue-700" />
+										<span className="text-sm font-medium">YouTube</span>
 								</button>
 							</div>
 
@@ -342,12 +379,12 @@ const Summarizer = () => {
 
 					<div
 						id="output"
-						className="w-full min-h-[700px] lg:w-1/2 rounded-2xl border border-slate-200
+						className="flex min-h-[28rem] min-w-0 w-full flex-1 flex-col rounded-xl border border-slate-200
                         bg-white
                         shadow-sm overflow-hidden "
 					>
 						<div className="bg-white h-20 w-full flex justify-between items-center p-5 border-b border-gray-200">
-							<p className="text-xl text-gray-700 font-semibold">Summery</p>
+							<p className="text-xl text-gray-700 font-semibold">Summary</p>
 							<div className="flex gap-2">
 								<button
 									onClick={() => copyToClipboard()}
@@ -364,7 +401,7 @@ const Summarizer = () => {
 								</button>
 							</div>
 						</div>
-						<div className="h-[500px] p-5 overflow-y-auto border-b-2 border-gray-200">
+						<div className="min-h-[22rem] flex-1 overflow-y-auto border-b-2 border-gray-200 p-5 lg:min-h-0">
 							{loading ? (
 								<div className="h-full flex flex-col items-center justify-center gap-3 text-blue-600">
 									<div className="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin" />
@@ -416,7 +453,7 @@ const Summarizer = () => {
 						<div className="px-2 py-4">
 							<div
 								className="w-full rounded-xl border border-blue-200
-                                bg-gradient-to-r from-blue-50 to-indigo-50
+								bg-gradient-to-r from-blue-50 to-slate-50
                                 p-2 sm:p-5"
 							>
 								<div

@@ -8,7 +8,7 @@ const AskAI = ({ setChatOpen }) => {
 				className="absolute right-0 top-0
                    w-full sm:w-md
                    h-full
-                   bg-white
+					bg-slate-50
                    shadow-2xl
                    flex flex-col"
 			>
@@ -21,7 +21,7 @@ const AskAI = ({ setChatOpen }) => {
 					<div className="flex items-center gap-3">
 						<div
 							className="w-10 h-10 rounded-xl
-                         bg-blue-600
+										bg-blue-700
                          flex items-center justify-center
                          text-white"
 						>
@@ -68,7 +68,7 @@ const AskAI = ({ setChatOpen }) => {
 
 						<div
 							className="max-w-[85%]
-                         bg-gray-100
+																border border-slate-200 bg-white
                          px-4 py-3
                          rounded-2xl rounded-tl-sm"
 						>
@@ -84,7 +84,7 @@ const AskAI = ({ setChatOpen }) => {
 					<div className="flex justify-end">
 						<div
 							className="max-w-[80%]
-                         bg-blue-600
+																bg-blue-700
                          text-white
                          px-4 py-3
                          rounded-2xl rounded-tr-sm"
@@ -107,7 +107,7 @@ const AskAI = ({ setChatOpen }) => {
 
 						<div
 							className="max-w-[85%]
-                         bg-gray-100
+																border border-slate-200 bg-white
                          px-4 py-3
                          rounded-2xl rounded-tl-sm"
 						>

@@ -1,5 +1,5 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { AIsummarizer } from "../ai/gemini.services.js"
+import { AIsummarizer } from "../ai/ai.services.js"
 
  
 

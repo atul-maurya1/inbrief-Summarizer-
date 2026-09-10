@@ -1,5 +1,5 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import {AIsummarizer} from '../ai/gemini.services.js'
+import {AIsummarizer} from '../ai/ai.services.js'
 
 export const extractTextFromPdf = async (filePath) => {
 
