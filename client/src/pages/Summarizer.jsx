@@ -34,7 +34,7 @@ const Summarizer = () => {
 
 	const { user, logout } = useContext(authContext)
 	
-
+    // console.log("user ", user.name)
 	
 	function copyToClipboard() {
 		if (summery) {

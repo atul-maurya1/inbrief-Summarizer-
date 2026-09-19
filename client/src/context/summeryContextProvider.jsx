@@ -2,28 +2,28 @@ import{useState , useEffect} from "react"
 import axios from "axios"
 
 import {SummeryContext} from './summeryContext.js'
+import {getSummaryApi} from '../api/summery.api.js'
 
 const SummeryContextProvider = ({children}) => {
 
-    const [summery, setSummery] = useState(null);
+    const [summery, setSummary] = useState(null);
 	const [loading, setLoading] = useState(false);
     const [error , setError] = useState("")
 
-    const fetchSummery = async (inputType, value) => {
+    const fetchSummary = async (inputType, value) => {
         setLoading(true)
           try{
           
              const formData = new FormData();
-
-             //formData.append("type", value);
 
             if (inputType === "text") formData.append("text", value)
             if (inputType === "pdf") formData.append("file", value)
             if (inputType === "url") formData.append("url", value)
             if (inputType === "vedio") formData.append("vedio", value)
 
-            const res = await axios.post('http://localhost:8000/api/v1/summarizer/summarize-content', formData)
-            setSummery(res.data.data)
+        
+            const res = await getSummaryApi(formData)
+            setSummary(res.data)
 
         }catch(err){
             console.error("error while fetchSummery ", err)
@@ -39,7 +39,7 @@ const SummeryContextProvider = ({children}) => {
     return(
         <SummeryContext.Provider value ={{ 
                 summery,
-                fetchSummery,
+                fetchSummary,
                 loading,
                 error
                  }} >

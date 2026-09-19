@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 export const AuthContextProvider = ({children}) => {
      const navigate = useNavigate()
-    const [user, setUser] = useState();
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState("")
 

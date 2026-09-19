@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, Outlet } from "react-router-dom";
 import Sidebar from '../components/Sidebar'
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoClose } from "react-icons/io5";
 import logo from '../assets/logo.png';
 import ProfilePic from "../components/ProfilePic";
+import {authContext} from '../context/authContext'
+
 
 const ChatLayout = () => {
 
-    let user = null
+     const{ user } = useContext(authContext)
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -51,7 +53,11 @@ const ChatLayout = () => {
                             <img src={logo} alt="InBrief logo" />
                         </div>
                     </button>
-                    {user ? <ProfilePic/> : "Login"}
+                  
+                        <div className="flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 p-1 shadow-sm ring-1 ring-white transition hover:border-blue-200">
+                            <ProfilePic />
+                        </div>
+                    
                 </div>
 
                 <main className="workspace-main min-h-0 flex-1 overflow-auto bg-slate-50">

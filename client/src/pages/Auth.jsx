@@ -189,9 +189,9 @@ const Auth = () => {
                         </button>
                     </form>
 
-                    <button type="button" className="auth-trial-button">
+                    <Link to="/summarizer"  type="button" className="auth-trial-button  text-center">
                        Get Start
-                    </button>
+                    </Link>
 
                     <p className="mt-7 text-center text-xs leading-5 text-slate-500">
                         By continuing, you agree to our Terms and Privacy Policy.

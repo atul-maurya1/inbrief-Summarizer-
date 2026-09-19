@@ -8,9 +8,13 @@ import {useContext} from 'react'
 import {authContext} from '../context/authContext' 
 import logo from '../assets/logo.png';
 import ProfilePic from "./ProfilePic";
+import { useNavigate } from "react-router-dom";
+import { MdLogout } from "react-icons/md";
+
 
 const SideBar = ({ onClose }) => {
-     const{ user } = useContext(authContext)
+     const{ user, logout } = useContext(authContext)
+     const navigate = useNavigate()
     return (
         <div className="workspace-sidebar flex h-screen w-64 flex-col border-r border-slate-200 bg-white p-4 text-slate-200">
             {/* Close button for mobile */}
@@ -62,16 +66,49 @@ const SideBar = ({ onClose }) => {
                  </ul>
                 </div>
 
-                     <div id="pro" className="flex cursor-pointer items-center gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm font-semibold text-blue-800 transition hover:bg-blue-100">
+                    {user === null ? <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                            <h3 className="text-sm font-bold text-slate-800">Get more from InBrief</h3>
+                                            <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                                                Sign in to save your history and unlock a more personalized experience.
+                                            </p>
+                                            <div className="mt-4 flex flex-col gap-2">
+                                                <button
+                                                    onClick={() => navigate('/login')}
+                                                    className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                                >
+                                                    Log in
+                                                </button>
+                                                <button
+                                                    onClick={() => navigate('/signup')}
+                                                    className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+                                                >
+                                                    Create an account
+                                                </button>
+                                            </div>
+                                        </div> :  <div  >
+                        <div id="pro" className="flex cursor-pointer items-center gap-3 mb-5 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm font-semibold text-blue-800 transition hover:bg-blue-100">
                          <BsStars size={20} /> <div className="flex items-center justify-between gap-3" > Upgrade to Pro <IoIosArrowForward/></div>
-                </div>
+                      </div>
 
-                <div id="profile" className="mt-auto flex items-center gap-3 border-t border-slate-200 p-3 pt-4">
-                   
-                       <ProfilePic />
-                        <p className="text-xs text-slate-400">{user ? (user?.data?.userType) + '  PLAN' : ""} </p>
-                   
-                </div>
+                     <div id="profile" className="mt-auto flex items-center gap-3 border-t border-slate-200 p-3 pt-4">
+                        <ProfilePic />
+                        <div className="min-w-0 flex-1">
+                            <p className="truncate text-[11px] font-medium uppercase tracking-[0.12em] text-slate-400">
+                                {user ? `${user?.data?.userType} PLAN` : ""}
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => logout()}
+                            type="button"
+                            aria-label="Log out"
+                            className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-slate-500 transition hover:bg-red-50 hover:text-red-600"
+                        >
+                            <MdLogout size={18} />
+                            <span className="text-[10px] font-medium">Log out</span>
+                        </button>
+                    </div>
+                 </div> }
+                 
             </div>
         </div>
     )

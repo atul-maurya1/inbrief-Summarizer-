@@ -1,11 +1,20 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import {AIsummarizer} from '../ai/ai.services.js'
 
-export const extractTextFromPdf = async (filePath) => {
-
+export const extractTextFromPdf = async (pdfUrl) => {
     try{
-       const loader = new PDFLoader(filePath)
-       const docs = await loader.load()
+        const response = await fetch(pdfUrl); // Fetch the PDF and response object
+
+        const buffer = await response.arrayBuffer(); //convert response into binary data
+
+        const blob = new Blob([buffer], { // Take this binary data and package it as a (web-standard) file-like object.
+            type: "application/pdf"  // data represents a PDF.
+        });
+
+       const loader = new PDFLoader(blob) // parse the PDF and extract its text.
+       const docs = await loader.load()  // convert into doc
+
+     
 
        let cleanDocs = []
        docs.map((doc) => {
@@ -16,7 +25,6 @@ export const extractTextFromPdf = async (filePath) => {
             `)
         }).join("\n\n");
 
-        //console.log(cleanDocs)
         return await AIsummarizer(cleanDocs)  
 
     }catch(err){

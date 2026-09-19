@@ -4,13 +4,13 @@ import { PiSpinnerGapBold } from "react-icons/pi";
 
 
 const TextArea = () => {
-const {fetchSummery, loading} = useContext(SummeryContext)
+const {fetchSummary, loading} = useContext(SummeryContext)
 const [text, setText] = useState("")
 const [charCount, setCharCount] = useState(0)
 
 	function handleOnClick(){
 		if(text ==="") return
-		fetchSummery("text", text)
+		fetchSummary("text", text)
 
    }
 

@@ -14,14 +14,14 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/auth" element={user ? <Navigate to="/summarizer" replace /> : <Auth />} />
+      <Route path="/auth" element = <Auth /> />
 
-      <Route path="/" element={user ? <ChatLayout /> : <Navigate to="/auth" replace />}>
-        <Route path="summarizer" element={<Summarizer />} />
-        <Route path="ai-chat" element={<AIChat />} />
+      <Route element= <ChatLayout /> >
+        <Route path="/summarizer" element={<Summarizer />} />
+        <Route path="/ai-chat" element={<AIChat />} />
       </Route>
 
-      <Route path="*" element={<Navigate to={user ? "/summarizer" : "/auth"} replace />} />
+      //<Route path="*" element={<Navigate to={user ? "/summarizer" : "/auth"} replace />} />
     </Routes>
   )
 }

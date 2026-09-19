@@ -21,6 +21,3 @@ export const getCurrentUserApi = async () => {
 }
 
 
-export const getSummery = async () =>{
-   
-}

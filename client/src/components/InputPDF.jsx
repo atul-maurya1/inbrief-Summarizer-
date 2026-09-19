@@ -7,11 +7,11 @@ const InputPDF = () => {
 
 	 const [pdf, setPDF] = useState(null);
 
-	const {fetchSummery, loading} = useContext(SummeryContext)
+	const {fetchSummary, loading} = useContext(SummeryContext)
 	
-	 const handleSubmit =  (e) => {
+	 const handleSubmit =  async (e) => {
 		 e.preventDefault()
-		 fetchSummery("pdf", pdf)
+ 		 await fetchSummary("pdf", pdf)
        
 	}
 

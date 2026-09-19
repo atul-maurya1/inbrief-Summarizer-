@@ -7,14 +7,14 @@ import { PiSpinnerGapBold } from "react-icons/pi";
 
 const InputLink = () => {
 
-  const {fetchSummery, loading} = useContext(SummeryContext)
+  const {fetchSummary, loading} = useContext(SummeryContext)
   const [url, setUrl] = useState("")
 
   function handleOnClick () {
    // e.preventDefault()
     if(url === "") return
     console.log("url", url)
-    fetchSummery("url", url)
+    fetchSummary("url", url)
 
   }
 

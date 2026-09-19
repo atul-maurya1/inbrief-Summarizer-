@@ -16,7 +16,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cookieParser({limit: "20kb"}))
-app.use(express.urlencoded({extended: true, limit: '10kb'}))
+app.use(express.urlencoded({extended: true}))
 app.use(halmet())
 app.use(hpp())
 // app.use(mongoSanitize())
@@ -27,9 +27,11 @@ app.use(rateLimiter({
 }))
 
 app.use(cors({
-  origin: "http://localhost:5173",
-   credentials: true 
+    origin: "http://localhost:5173",
+    credentials: true
 }));
+
+
 
 
 app.get("/", (req, res) => {
