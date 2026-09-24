@@ -8,7 +8,7 @@ export const extractTextFromPdf = async (pdfUrl) => {
         const buffer = await response.arrayBuffer(); //convert response into binary data
 
         const blob = new Blob([buffer], { // Take this binary data and package it as a (web-standard) file-like object.
-            type: "application/pdf"  // data represents a PDF.
+            type: "application/pdf"  // data represents a PDF.  
         });
 
        const loader = new PDFLoader(blob) // parse the PDF and extract its text.

@@ -42,7 +42,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/summarizer', summarizerRouter)
 app.use('/api/v1', healthRouter)
 
-app.use('/api', ChatToAIRoutes)
+app.use('/api/v1/chat', ChatToAIRoutes)
 
 
 

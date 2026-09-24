@@ -3,7 +3,6 @@ import ApiResponse from "../utils/apiRespone.js";
 import textServices  from "../services/extraction/text.services.js"
 import {extractTextFromPdf} from "../services/extraction/pdf.services.js"
 import {urlService} from '../services/extraction/url.services.js'
-import History from '../models/history.model.js'
 import pdfUploader from '../config/cloudinary.config.js'
 
 export const summarizeContent  = async (req, res, next) => {    
@@ -15,24 +14,15 @@ export const summarizeContent  = async (req, res, next) => {
             throw new ApiError(400, "Please provide an input");
         }
 
-        let history
-        if(userId){
-           history = await History.create({
-                user: userId
-            })
-        }
+       
 
         let response    
 		if (text) {
 			 console.log("text");
-             history.source.text = text
-             await history.save({validationBeforeSave: false})
              response =  await textServices(text)  
 		}
 	    if (url) { 
 				console.log("url");
-                 history.source.url = url
-                 await history.save({validationBeforeSave: false})
                 response = await urlService(url)
 		}
 

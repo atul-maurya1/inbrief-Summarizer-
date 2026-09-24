@@ -60,7 +60,7 @@ export const AIsummarizer = async (chunks) => {
 			  model: "qwen3:1.7b",
 			  temperature: 0,
 			  think: false,
-			});
+			}); 
 
 		const structuredModel = model.withStructuredOutput(summarySchema);
 		const chunkStructuredModel = model.withStructuredOutput(chunkSchema)

@@ -1,26 +1,31 @@
-// import {AIsummarizerchat} from '../services/ai/gemini.services.js'
-// import ApiError from '../utils/apiError.js'
-// import ApiResponse from '../utils/apiRespone.js'
+import { ChatOllama } from "@langchain/ollama";
 
-// export const ChatToAI = async (req, res) =>{
-//     try{
-//         const {message} = req.body
-//         console.log("req ", req.body)
-//         if(!message) return
+import ApiError from '../utils/apiError.js'
+import ApiResponse from '../utils/apiRespone.js'
 
-//         const data = await AIsummarizer(message)
-//         if(!data){
-//            throw new ApiError(400, "Error in AI model")
-//         }
+export const ChatToAI = async (req, res) =>{
+   
+    try{
+         const {inputMsg} = req.body
+         if(!inputMsg) return
 
-//         return res.status(200).json( new
-//             ApiResponse(200,  {data: data}, "response successfully")
-//         )
+        const chatModel = new ChatOllama({
+              model: "qwen3:1.7b",
+			  temperature: 0,
+			  think: false,
+        })
 
-//     }
-//     catch(e){
+       const response = await chatModel.invoke(inputMsg)
 
-//         console.error("something went wrong ", e)
+       //console.log("model response is ", response.content)
+        return res.status(200).json( new
+            ApiResponse(200,  {content: response.content}, "response successfully")
+        )
 
-//     }    
-// }
+    }
+    catch(e){
+
+        console.error("something went wrong ", e)
+
+    }    
+}
