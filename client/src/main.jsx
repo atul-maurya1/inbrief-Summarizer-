@@ -8,7 +8,7 @@ import { AuthContextProvider } from "./context/authContextProvider.jsx";
 import {HistoryContextProvider} from './context/historyContextProvider.jsx'
 
 createRoot(document.getElementById("root")).render(
-	<StrictMode>
+
 		<BrowserRouter>
 			<AuthContextProvider>
 				<SummeryContextProvider>
@@ -18,5 +18,5 @@ createRoot(document.getElementById("root")).render(
 				</SummeryContextProvider>
 			</AuthContextProvider>
 		</BrowserRouter>
-	</StrictMode>,
+	
 );

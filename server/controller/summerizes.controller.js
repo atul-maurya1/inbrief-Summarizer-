@@ -122,7 +122,7 @@ export const history = async (req, res, next ) => {
            
         ])
 
-        console.log(history)
+        // console.log(history)
 
         return res.status(200).json(
              new ApiResponse(200, history, "history fetched suucessfully")
@@ -140,6 +140,52 @@ export const history = async (req, res, next ) => {
             new ApiError(500, "Internal server error")
         );
 
+    }
+
+}
+
+export const historyContent = async (req, res, next) => {
+
+    try{
+         const summaryId =  req.query.summaryId
+         const contentId = req.query.contentId
+
+         if(!summaryId || !contentId){
+             return res.status(400).json(
+               new ApiError(400, "history not found")
+        )
+         }
+
+         console.log(`contentId ${contentId} -- summeryId ${summaryId}`)
+
+         const summary = await Summary.findById(summaryId)
+         const content = await Content.findById(contentId)
+
+        if (!summary || !content) {
+            return res.status(404).json(
+                new ApiError(404, "History content not found")
+            );
+        }
+
+         const history = { summary, content}
+ 
+         console.log("history ", history)
+
+         return res.status(200).json(
+               new ApiResponse(200, history, "history fetch successfully")
+         )
+       
+
+    }catch(err){
+         console.error("Error while fetching history content :", err); 
+
+        if (err instanceof ApiError) {
+            return next(err);
+        }
+
+        return next(
+            new ApiError(500, "Internal server error")
+        );
     }
 
 }

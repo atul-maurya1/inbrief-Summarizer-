@@ -9,13 +9,12 @@ import {
 import {useState, useEffect} from "react"
 import { useNavigate } from "react-router-dom";
 
-
-
 export const AuthContextProvider = ({children}) => {
      const navigate = useNavigate()
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false)
-    const [errors, setErrors] = useState("")
+    const [errors, setErrors] = useState("") 
+
 
 useEffect(() => {
     const checkAuth = async () => {
@@ -25,6 +24,7 @@ useEffect(() => {
             const data = await getCurrentUserApi();
 
             setUser(data);
+           
 
         } catch (err) {
             setUser(null);
@@ -82,6 +82,7 @@ useEffect(() => {
             setLoading(true)
             const response = await logoutApi()
             setUser(null)
+            
         }catch(err){
           console.log("error while logout ", err)
         }finally{

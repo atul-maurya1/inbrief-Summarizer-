@@ -20,17 +20,17 @@ app.use(express.urlencoded({extended: true}))
 app.use(halmet())
 app.use(hpp())
 // app.use(mongoSanitize())
-app.use(rateLimiter({
-     windowMs: 15 * 60 * 1000,
-     limit: 100,
-     message: "Too many request, please try again later"
-}))
 
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }));
 
+app.use(rateLimiter({
+     windowMs: 15 * 60 * 1000,
+     limit: 100,
+     message: "Too many request, please try again later"
+}))
 
 
 
