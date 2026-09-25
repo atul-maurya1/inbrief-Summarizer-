@@ -9,8 +9,11 @@ const contentSchema = new mongoose.Schema({
         required: true
     },
     title: {
+        type: String
+    },
+    url: {  // website url
         type: String,
-       required: true
+      
     },
     contentType: {
         type: String,
@@ -18,9 +21,8 @@ const contentSchema = new mongoose.Schema({
             "text",
             "pdf",
             "youtube",
-            "audio",
             "video",
-            "website"
+            "url"
         ],
        required: true
     },
@@ -39,7 +41,7 @@ const contentSchema = new mongoose.Schema({
 
     summary: {
        type: mongoose.Schema.Types.ObjectId,
-       ref: "Summery"
+       ref: "Summary"
        
     }
     

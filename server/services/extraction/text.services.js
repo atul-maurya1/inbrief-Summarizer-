@@ -11,7 +11,7 @@ const textServices = async (text) => {
      });
                  
     const chunks = await splitter.splitText(text);
-    return await AIsummarizer(chunks);
+     return await AIsummarizer(chunks);
          
     }catch(err){
 

@@ -60,6 +60,7 @@ const InputPDF = () => {
 				<input
 					id="pdf-upload"
 					type="file"
+					name="pdf"
 					accept=".pdf,application/pdf"
 					className="hidden"
 					onChange={(e) => setPDF(e.target.files[0])}

@@ -1,8 +1,10 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import {AIsummarizer} from '../ai/ai.services.js'
 
+
 export const extractTextFromPdf = async (pdfUrl) => {
     try{
+      
         const response = await fetch(pdfUrl); // Fetch the PDF and response object
 
         const buffer = await response.arrayBuffer(); //convert response into binary data
@@ -26,7 +28,7 @@ export const extractTextFromPdf = async (pdfUrl) => {
         }).join("\n\n");
 
         return await AIsummarizer(cleanDocs)  
-
+    
     }catch(err){
        console.log(err)
         throw err;

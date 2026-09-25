@@ -10,10 +10,18 @@ import logo from '../assets/logo.png';
 import ProfilePic from "./ProfilePic";
 import { useNavigate } from "react-router-dom";
 import { MdLogout } from "react-icons/md";
+import {historyContext} from '../context/historyContext'
+
 
 
 const SideBar = ({ onClose }) => {
+
+    
+const {history} = useContext(historyContext)
+
+
      const{ user, logout } = useContext(authContext)
+     
      const navigate = useNavigate()
     return (
         <div className="workspace-sidebar flex h-screen w-64 flex-col border-r border-slate-200 bg-white p-4 text-slate-200">
@@ -60,10 +68,28 @@ const SideBar = ({ onClose }) => {
 
                      <div id="history" className="flex-1 border-t border-slate-200 p-3">
                      <h2 className="mb-3 pt-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-400" >History</h2>
-                      <ul className="space-y-2 text-sm text-slate-600" >
-                          <li className="truncate">Future of AI</li>
-                          <li className="truncate">What is Machine Learning</li>
-                 </ul>
+                      <ul className="space-y-1.5 text-sm text-slate-600">
+                        {history.length === 0 ? (
+                            <li className="rounded-lg border border-dashed border-slate-200 px-3 py-5 text-center text-xs leading-relaxed text-slate-400">
+                                Your saved summaries will appear here.
+                            </li>
+                        ) : (
+                            history.map((hs) => (
+                                <li key={hs._id}>
+                                    <button
+                                        type="button"
+                                        onClick={() => console.log(hs)}
+                                        className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-blue-50"
+                                    >
+                                        <span className="h-2 w-2 shrink-0 rounded-full bg-slate-300 transition group-hover:bg-blue-500" />
+                                        <span className="truncate font-medium text-slate-600 group-hover:text-blue-700">
+                                            {hs.title || hs.summary || "Untitled summary"}
+                                        </span>
+                                    </button>
+                                </li>
+                            ))
+                        )}
+                      </ul>
                 </div>
 
                     {user === null ? <div className="mt-auto rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">

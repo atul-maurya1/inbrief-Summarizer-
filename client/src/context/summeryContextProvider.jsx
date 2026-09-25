@@ -19,7 +19,7 @@ const SummeryContextProvider = ({children}) => {
             if (inputType === "text") formData.append("text", value)
             if (inputType === "pdf") formData.append("file", value)
             if (inputType === "url") formData.append("url", value)
-            if (inputType === "vedio") formData.append("vedio", value)
+            if (inputType === "video") formData.append("file", value)
 
         
             const res = await getSummaryApi(formData)

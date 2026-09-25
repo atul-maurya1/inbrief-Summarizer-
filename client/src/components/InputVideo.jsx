@@ -1,6 +1,22 @@
 import { FaVideo } from "react-icons/fa";
+import {useContext, useState} from "react"
+import {SummeryContext} from "../context/summeryContext"
 
 const InputVideo = () => {
+   
+   const [video, setViedo] = useState(null)
+   const {fetchSummary, loading} = useContext(SummeryContext)
+
+   const hanldeOnClick = async () => {
+	if (!video) {
+		alert("Please select a video !");
+		return;
+	}
+	console.log("video ", video)
+
+	await fetchSummary("video", video)
+   }
+
 	return (
 		<div className="w-full py-10">
 			<div
@@ -18,22 +34,22 @@ const InputVideo = () => {
 				</div>
 
 				<h3 className="text-base font-semibold text-slate-700 text-center">
-					Upload your video
+					{video ? video?.name  :"Upload your video"}
 				</h3>
 
 				<p className="mt-1 text-sm text-slate-400 text-center">
-					Select a video file to add your content
+					{video ? "Video Uploader Successfully " :"Select a video file to add your content"}
 				</p>
 
 				<div className="flex justify-center" >
-                    <span
+					<label
 					htmlFor="video-upload"
 					className="mt-3 px-4 py-2 rounded-lg
                      bg-blue-600 text-white text-sm font-medium
                      hover:bg-blue-700 transition"
 				>
 					Choose Video
-				</span>
+					</label>
                 </div>
 
 				
@@ -42,6 +58,7 @@ const InputVideo = () => {
 					type="file"
 					accept="video/*"
 					className="hidden"
+					onChange={(e) => setViedo(e.target.files[0])}
 				/>
 
 				<p className=" text-center mt-3 text-xs text-slate-400">MP4, WebM, MOV</p>
@@ -49,6 +66,7 @@ const InputVideo = () => {
 
 			<div className="py-5" >
                 <button
+				  onClick={hanldeOnClick}
 				type="button"
 				className="w-full mt-4 py-3 rounded-xl
                    bg-blue-700 hover:bg-blue-600
@@ -57,6 +75,7 @@ const InputVideo = () => {
 			>
 				Upload Video
 			</button>
+			
             </div>
 		</div>
 	);

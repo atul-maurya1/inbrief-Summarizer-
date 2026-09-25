@@ -33,7 +33,7 @@ useEffect(() => {
         }
     };
 
-    checkAuth(); // 👈 you were missing this
+    checkAuth(); 
 }, [navigate]);
 
 

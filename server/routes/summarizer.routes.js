@@ -6,9 +6,10 @@ import {uploader} from '../utils/multer.js'
 import {verifyJWT} from '../middleware/auth.middleware.js'
 
 
-import {summarizeContent} from '../controller/summerizes.controller.js'
+import {summarizeContent, history} from '../controller/summerizes.controller.js'
 
 summarizerRouter
                .post('/summarize-content', verifyJWT, uploader.single('file'), summarizeContent)
+               .get('/history', verifyJWT , history)
 
 export default summarizerRouter   

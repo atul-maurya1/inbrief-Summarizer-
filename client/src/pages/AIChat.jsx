@@ -1,115 +1,220 @@
+import axios from 'axios'
 import logo from "../assets/logo.png";
 import ProfilePic from "../components/ProfilePic";
 import { BsSendFill } from "react-icons/bs";
 import { LuBotMessageSquare } from "react-icons/lu";
+import { useState } from "react";
 
 const AIChat = () => {
+	const [input, setInput] = useState("");
+	const [messages, setMessages] = useState([]);
+	const [loading, setLoading] = useState(false)
+
+	const handleOnClick = async () => {
+		if (!input.trim()) return;
+
+		const userMessage = input.trim();
+
+		// Add user message
+		setMessages((prev) => [
+			...prev,
+			{
+				role: "user",
+				content: userMessage,
+			},
+		]);
+
+		// Clear input
+		setInput("");
+
+		setLoading(true)
+		let res
+		try{
+		 res = await axios.post(' http://localhost:8000/api/v1/chat/chat-ai', {
+			inputMsg: userMessage,
+		
+		})
+		}catch{
+			setLoading(false)
+		}
+		finally{
+			setLoading(false)
+		}
+		//console.log("res", res.data.data.content)
+
+		// Bot response after 500ms
+	setMessages((prev) => [
+				...prev,
+				{
+					role: "bot",
+					content: res.data.data.content,
+				},
+			]);
+		
+	};
+
+	// Send message with Enter key
+	const handleKeyDown = (e) => {
+		if (e.key === "Enter") {
+			handleOnClick();
+		}
+	};
+
+	
 	return (
 		<div>
+			{/* Header */}
 			<div className="hidden items-center justify-between border-b border-slate-200 bg-white px-7 py-4 lg:flex">
-				<div className="flex justify-center items-center gap-2 ">
-					<img width="90px" size={10} src={logo} alt="logo" />
-					<span className="text-lg font-semibold tracking-tight text-slate-900">AI Chat</span>
+				<div className="flex justify-center items-center gap-2">
+					<img width="90px" src={logo} alt="logo" />
+
+					<span className="text-lg font-semibold tracking-tight text-slate-900">
+						AI Chat
+					</span>
 				</div>
+
 				<ProfilePic />
 			</div>
 
+			{/* Chat Area */}
+           
 			<div className="px-4 py-6 sm:px-6 lg:px-10">
-				
 				<div className="h-145 overflow-y-auto space-y-5 pr-2">
-					{/* User Message */}
-					<div className="flex justify-end">
-						<div
-							className="max-w-[80%] sm:max-w-[70%]
-																bg-blue-700 text-white
-                   px-4 py-3
-                   rounded-2xl rounded-tr-sm
-                   shadow-sm"
-						>
-							<p className="text-sm leading-6">Hi, How are you?</p>
+					{messages.length === 0 && (
+						<div className="flex min-h-56 items-center justify-center text-center">
+							<h1 className="bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text px-4 text-3xl font-extrabold tracking-tight text-transparent sm:text-4xl">
+								Welcome to InBrief Chat Bot
+							</h1>
 						</div>
-					</div>
+					)}
 
-					{/* AI Message */}
-					<div className="flex items-start gap-3">
-						{/* AI Icon */}
-						<div
-							className="w-8 h-8 shrink-0
-                   rounded-lg
-                   bg-blue-100
-                   text-blue-600
-                   flex items-center justify-center"
-						>
-							<span className="text-sm font-semibold"> <LuBotMessageSquare/> </span>
-						</div>
+					{messages.map((msg, index) => (
+						<div key={index}>
+							{msg.role === "user" ? (
+								/* User Message */
+								<div className="flex justify-end">
+									<div
+										className="
+											max-w-[80%] sm:max-w-[70%]
+											bg-blue-700 text-white
+											px-4 py-3
+											rounded-2xl rounded-tr-sm
+											shadow-sm
+										"
+									>
+										<p className="text-sm leading-6">
+											{msg.content}
+										</p>
+									</div>
+								</div>
+							) : (
+								/* Bot Message */
+								<div className="flex items-start gap-3">
 
-						{/* AI Response */}
-						<div
-							className="max-w-[80%] sm:max-w-[70%]
-																border border-slate-200 bg-white
-                   text-gray-700
-                   px-4 py-3
-                   rounded-2xl rounded-tl-sm"
-						>
-							<p className="text-sm leading-6">
-								Hello, I am fine. How are you?
-							</p>
+									{/* Bot Icon */}
+									
+									<div
+										className={`
+											w-8 h-8 shrink-0
+											rounded-lg
+											bg-blue-100
+											text-blue-600
+											flex items-center justify-center
+											${loading ? "animate-pulse scale-110" : ""}
+											transition-transform duration-300
+										`}
+									>
+										<LuBotMessageSquare />
+									</div>
+
+									{/* Bot Response */}
+									<div
+										className="
+											max-w-[80%] sm:max-w-[70%]
+											border border-slate-200
+											bg-white text-gray-700
+											px-4 py-3
+											rounded-2xl rounded-tl-sm
+										"
+									>
+										<p className="text-sm leading-6">
+											{msg.content}
+										</p>
+									</div>
+								</div>
+							)}
 						</div>
-					</div>
+					))}
+
 				</div>
 			</div>
 
+			{/* Input */}
 			<div className="px-7">
 				<div className="w-full px-4">
 					<div
-						className="flex items-center gap-2
-                        w-full
-                        p-2
-                        bg-white
-                        border border-gray-200
-                        rounded-2xl
-                        shadow-sm
-                        border-gray-200
-                        focus-within:ring-2
-                        focus-within:ring-blue-500/10"
+						className="
+							flex items-center gap-2
+							w-full
+							p-2
+							bg-white
+							border border-gray-200
+							rounded-2xl
+							shadow-sm
+							focus-within:ring-2
+							focus-within:ring-blue-500/10
+						"
 					>
+						{/* Plus Button */}
 						<button
 							type="button"
-							className="w-10 h-10 shrink-0
-                            flex items-center justify-center
-                            rounded-xl
-                            text-gray-500
-                            hover:bg-gray-100
-                            hover:text-blue-600
-                            transition"
+							className="
+								w-10 h-10 shrink-0
+								flex items-center justify-center
+								rounded-xl
+								text-gray-500
+								hover:bg-gray-100
+								hover:text-blue-600
+								transition
+							"
 						>
-							<span className="text-3xl font-light text-center">+</span>
+							<span className="text-3xl font-light text-center">
+								+
+							</span>
 						</button>
 
 						{/* Input */}
 						<input
+							value={input}
+							onChange={(e) => setInput(e.target.value)}
+							onKeyDown={handleKeyDown}
 							type="text"
 							placeholder="Ask anything..."
-							className="flex-1
-                            min-w-0
-                            h-10
-                            px-2
-                            bg-transparent
-                            text-sm text-gray-700
-                            outline-none"
+							className="
+								flex-1
+								min-w-0
+								h-10
+								px-2
+								bg-transparent
+								text-sm text-gray-700
+								outline-none
+							"
 						/>
 
 						{/* Send Button */}
 						<button
+							onClick={handleOnClick}
 							type="button"
-							className="w-10 h-10 shrink-0
-                            flex items-center justify-center
-                            rounded-xl
-                            bg-blue-600
-                            text-white
-                            hover:bg-blue-700
-                            active:scale-95
-                            transition"
+							className="
+								w-10 h-10 shrink-0
+								flex items-center justify-center
+								rounded-xl
+								bg-blue-600
+								text-white
+								hover:bg-blue-700
+								active:scale-95
+								transition
+							"
 						>
 							<BsSendFill size={15} />
 						</button>
@@ -123,4 +228,5 @@ const AIChat = () => {
 		</div>
 	);
 };
-export default AIChat;
+
+export default AIChat 

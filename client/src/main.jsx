@@ -5,13 +5,16 @@ import "./index.css";
 import App from "./App.jsx";
 import SummeryContextProvider from "./context/summeryContextProvider.jsx";
 import { AuthContextProvider } from "./context/authContextProvider.jsx";
+import {HistoryContextProvider} from './context/historyContextProvider.jsx'
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<BrowserRouter>
 			<AuthContextProvider>
 				<SummeryContextProvider>
-					<App />
+					<HistoryContextProvider>
+                       <App />
+					</HistoryContextProvider>	
 				</SummeryContextProvider>
 			</AuthContextProvider>
 		</BrowserRouter>
