@@ -116,7 +116,8 @@ export const history = async (req, res, next ) => {
             $project: { 
                _id: 1,
                title: 1,
-               summary: 1
+               summary: 1,
+               contentType: 1
             }
            }
            

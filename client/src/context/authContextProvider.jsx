@@ -6,7 +6,7 @@ import {
     getCurrentUserApi
 } from '../api/auth.api.js'
 
-import {useState, useEffect} from "react"
+import {useState, useEffect, useContext} from "react"
 import { useNavigate } from "react-router-dom";
 
 export const AuthContextProvider = ({children}) => {
@@ -14,6 +14,7 @@ export const AuthContextProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState("") 
+
 
 
 useEffect(() => {
@@ -78,14 +79,15 @@ useEffect(() => {
       
 
     const logout = async () => {
+        setUser(null)
+        navigate('/auth', { replace: true })
         try{
             setLoading(true)
-            const response = await logoutApi()
-            setUser(null)
-            
+            await logoutApi()
         }catch(err){
           console.log("error while logout ", err)
         }finally{
+            setUser(null)
             setLoading(false)
         }
     }

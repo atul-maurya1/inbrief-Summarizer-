@@ -1,12 +1,16 @@
 import {useContext, useState, useEffect} from "react"
 import {SummeryContext} from "../context/summeryContext"
 import { PiSpinnerGapBold } from "react-icons/pi";
-
+import {historyContext} from '../context/historyContext'
 
 const TextArea = () => {
 const {fetchSummary, loading} = useContext(SummeryContext)
 const [text, setText] = useState("")
 const [charCount, setCharCount] = useState(0)
+
+const {historyContent} = useContext(historyContext)
+
+  console.log(historyContent)
 
 	function handleOnClick(){
 		if(text ==="") return

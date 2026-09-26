@@ -14,6 +14,7 @@ import { jsPDF } from "jspdf";
 import { useState } from "react";
 
 import TextArea from "../components/TextArea";
+import HistoryContent from "../components/HistoryContent";
 import InputPDF from "../components/InputPDF";
 import InputLink from "../components/InputLink";
 import InputYTLink from "../components/InputYTLink";
@@ -24,15 +25,20 @@ import { useContext } from "react"
 
 import { SummeryContext } from "../context/summeryContext"
 import {authContext} from '../context/authContext'
+import {historyContext} from '../context/historyContext'
 
 
 const Summarizer = () => {
 	const [inputText, setInputText] = useState("Text");
 	const [isChatOpen, setChatOpen] = useState(false);
-	const { summery, loading, error } = useContext(SummeryContext)
+	const { summery, loading, error, clearSummary } = useContext(SummeryContext)
+	const { historyContent } = useContext(historyContext)
 	const [copied, setCopied] = useState(false)
 
 	const { user, logout } = useContext(authContext)
+	const activeHistoryContent = historyContent?.summary?._id === summery?._id
+		? historyContent
+		: null
 	
     // console.log("user ", user.name)
 	
@@ -326,7 +332,7 @@ const Summarizer = () => {
 								</button>
 
 								<button
-									onClick={() => { setInputText("Link"), summery("") }}
+									onClick={() => { setInputText("Link"); clearSummary() }}
 									className={`w-full sm:flex-1 flex items-center justify-center
                                      px-4 py-3 bg-white border rounded-lg gap-2 hover:border-blue-600 cursor-pointer
                                      ${inputText === "Link"
@@ -407,6 +413,8 @@ const Summarizer = () => {
 									<div className="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin" />
 									<p className="text-sm font-medium">Creating your summary...</p>
 								</div>
+							) : activeHistoryContent ? (
+								<HistoryContent historyContent={activeHistoryContent} />
 							) : summery ? (
 								<div className="space-y-3">
 									<div className="flex items-center gap-2 mb-4 text-blue-700">

@@ -1,17 +1,42 @@
-import{useState , useEffect} from "react"
-import axios from "axios"
+import {useState, useEffect, useContext, useRef} from "react"
 
 import {SummeryContext} from './summeryContext.js'
 import {getSummaryApi} from '../api/summery.api.js'
+import {authContext} from './authContext.js'
 
 const SummeryContextProvider = ({children}) => {
 
     const [summery, setSummary] = useState(null);
 	const [loading, setLoading] = useState(false);
     const [error , setError] = useState("")
+    const {user} = useContext(authContext)
+    const requestIdRef = useRef(0)
+
+    useEffect(() => {
+        if (!user) {
+            requestIdRef.current += 1
+            setSummary(null)
+            setError("")
+            setLoading(false)
+        }
+    }, [user])
+
+    const clearSummary = () => {
+        requestIdRef.current += 1
+        setSummary(null)
+        setError("")
+        setLoading(false)
+    }
 
     const fetchSummary = async (inputType, value) => {
+        if (!user) {
+            setError("Please log in to create a summary.")
+            return
+        }
+
+        const requestId = ++requestIdRef.current
         setLoading(true)
+        setError("")
           try{
           
              const formData = new FormData();
@@ -23,15 +48,15 @@ const SummeryContextProvider = ({children}) => {
 
         
             const res = await getSummaryApi(formData)
-            setSummary(res.data)
+            if (requestId === requestIdRef.current) setSummary(res.data)
 
         }catch(err){
             console.error("error while fetchSummery ", err)
-              setError(
-                err.response?.data || err.message
-            );
+            if (requestId === requestIdRef.current) {
+                setError(err.response?.data?.message || err.message)
+            }
         }finally{
-            setLoading(false)
+            if (requestId === requestIdRef.current) setLoading(false)
         }
 
     }
@@ -39,6 +64,8 @@ const SummeryContextProvider = ({children}) => {
     return(
         <SummeryContext.Provider value ={{ 
                 summery,
+                setSummary,
+                clearSummary,
                 fetchSummary,
                 loading,
                 error
