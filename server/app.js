@@ -5,12 +5,14 @@ import halmet from "helmet"
 import rateLimiter from "express-rate-limit"
 import hpp from "hpp"
 import cors from "cors"
-import ChatToAIRoutes from './routes/ChatToAI.routes.js'
+
 
 import connectDB from './config/db.config.js'
 import authRouter from './routes/auth.routes.js'
 import summarizerRouter from './routes/summarizer.routes.js'
 import healthRouter from './routes/health.routes.js'
+import ChatToAIRoutes from './routes/ChatToAI.routes.js'
+import askAIRouter from './routes/askAi.routes.js'
 
 const app = express()
 
@@ -42,8 +44,8 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/summarizer', summarizerRouter)
 app.use('/api/v1', healthRouter)
 
-app.use('/api/v1/chat', ChatToAIRoutes)
-
+app.use('/api/v1/ai', ChatToAIRoutes)
+app.use('/api/v1/ai', askAIRouter)
 
 
 const PORT = process.env.PORT

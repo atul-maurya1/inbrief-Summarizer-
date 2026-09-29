@@ -11,7 +11,7 @@ import { MdAutoAwesome, MdInfoOutline } from "react-icons/md";
 import { jsPDF } from "jspdf";
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import TextArea from "../components/TextArea";
 import HistoryContent from "../components/HistoryContent";
@@ -31,35 +31,39 @@ import {historyContext} from '../context/historyContext'
 const Summarizer = () => {
 	const [inputText, setInputText] = useState("Text");
 	const [isChatOpen, setChatOpen] = useState(false);
-	const { summery, loading, error, clearSummary } = useContext(SummeryContext)
+	const { summery, loading, error, clearSummary, askAI } = useContext(SummeryContext)
 	const { historyContent } = useContext(historyContext)
 	const [copied, setCopied] = useState(false)
+	const summaryContent = summery?.response ?? summery
+
+	// useEffect(() => {
+	// 	if (summery?.contentId) console.log("Summary contentId:", summery.contentId)
+	// }, [summery?.contentId])
 
 	const { user, logout } = useContext(authContext)
 	const activeHistoryContent = historyContent?.summary?._id === summery?._id
 		? historyContent
 		: null
 	
-    // console.log("user ", user.name)
-	
+		
 	function copyToClipboard() {
-		if (summery) {
+		if (summaryContent) {
 			let contentToCopy = "";
-			if (typeof summery === "object") {
+			if (typeof summaryContent === "object") {
 				// Title and main summary
-				contentToCopy += (summery.title ? summery.title + "\n\n" : "") + (summery.summary ? summery.summary + "\n\n" : "");
+				contentToCopy += (summaryContent.title ? summaryContent.title + "\n\n" : "") + (summaryContent.summary ? summaryContent.summary + "\n\n" : "");
 
 				// Key Points
-				if (Array.isArray(summery.keyPoints) && summery.keyPoints.length > 0) {
-					contentToCopy += "Key Points:\n" + summery.keyPoints.map((kp, i) => `${i + 1}. ${kp}`).join("\n") + "\n\n";
+				if (Array.isArray(summaryContent.keyPoints) && summaryContent.keyPoints.length > 0) {
+					contentToCopy += "Key Points:\n" + summaryContent.keyPoints.map((kp, i) => `${i + 1}. ${kp}`).join("\n") + "\n\n";
 				}
 
 				// Keywords
-				if (Array.isArray(summery.keywords) && summery.keywords.length > 0) {
-					contentToCopy += "Keywords: " + summery.keywords.join(", ") + "\n";
+				if (Array.isArray(summaryContent.keywords) && summaryContent.keywords.length > 0) {
+					contentToCopy += "Keywords: " + summaryContent.keywords.join(", ") + "\n";
 				}
 			} else {
-				contentToCopy = String(summery);
+				contentToCopy = String(summaryContent);
 			}
 			navigator.clipboard.writeText(contentToCopy);
 			setCopied(true)
@@ -180,30 +184,30 @@ const Summarizer = () => {
 			y += 4; // Slight gap between points
 		}
 
-		if (summery && typeof summery === "object") {
+		if (summaryContent && typeof summaryContent === "object") {
 			// TITLE
-			if (summery.title) {
-				addTitle(summery.title);
+			if (summaryContent.title) {
+				addTitle(summaryContent.title);
 			}
 
 			// SUMMARY
-			if (summery.summary) {
+			if (summaryContent.summary) {
 				addHeading("Summary");
-				addParagraph(summery.summary);
+				addParagraph(summaryContent.summary);
 			}
 
 			// KEY POINTS
-			if (Array.isArray(summery.keyPoints) && summery.keyPoints.length > 0) {
+			if (Array.isArray(summaryContent.keyPoints) && summaryContent.keyPoints.length > 0) {
 				addHeading("Key Points");
-				summery.keyPoints.forEach((point, index) => {
+				summaryContent.keyPoints.forEach((point, index) => {
 					addPoint(point, index);
 				});
 			}
 
 			// KEYWORDS
-			if (Array.isArray(summery.keywords) && summery.keywords.length > 0) {
+			if (Array.isArray(summaryContent.keywords) && summaryContent.keywords.length > 0) {
 				addHeading("Keywords");
-				addParagraph(summery.keywords.join(", "));
+				addParagraph(summaryContent.keywords.join(", "));
 			}
 		}
 
@@ -222,7 +226,7 @@ const Summarizer = () => {
 			);
 		}
 
-		doc.save(`${summery?.title} - summary.pdf`);
+		doc.save(`${summaryContent?.title || "summary"} - summary.pdf`);
 	
 
 	}
@@ -413,6 +417,8 @@ const Summarizer = () => {
 									<div className="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin" />
 									<p className="text-sm font-medium">Creating your summary...</p>
 								</div>
+							) : error ? (
+								<p role="alert" className="text-sm text-red-600">{error}</p>
 							) : activeHistoryContent ? (
 								<HistoryContent historyContent={activeHistoryContent} />
 							) : summery ? (
@@ -420,27 +426,27 @@ const Summarizer = () => {
 									<div className="flex items-center gap-2 mb-4 text-blue-700">
 										<MdAutoAwesome size={20} />
 										<h2 className="font-semibold">
-											{typeof summery === "object" ? summery.title || "AI-generated summary" : "AI-generated summary"}
+											{typeof summaryContent === "object" ? summaryContent.title || "AI-generated summary" : "AI-generated summary"}
 										</h2>
 									</div>
 									<div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-md text-gray-700 leading-7 whitespace-pre-wrap">
-										{typeof summery === "object" ? summery.summary : summery}
+										{typeof summaryContent === "object" ? summaryContent.summary : summaryContent}
 									</div>
-									{typeof summery === "object" && summery.keyPoints && (
+									{typeof summaryContent === "object" && summaryContent.keyPoints && (
 										<div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-gray-700">
 											<h3 className="font-semibold mb-2">Key points</h3>
-											{Array.isArray(summery.keyPoints) ? (
+											{Array.isArray(summaryContent.keyPoints) ? (
 												<ul className="list-disc pl-5 space-y-1">
-													{summery.keyPoints.map((point, index) => <li key={index}>{point}</li>)}
+													{summaryContent.keyPoints.map((point, index) => <li key={index}>{point}</li>)}
 												</ul>
-											) : <p className="whitespace-pre-wrap">{summery.keyPoints}</p>}
+											) : <p className="whitespace-pre-wrap">{summaryContent.keyPoints}</p>}
 										</div>
 									)}
-									{typeof summery === "object" && summery.keywords && (
+									{typeof summaryContent === "object" && summaryContent.keywords && (
 										<div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-gray-700">
 											<h3 className="font-semibold mb-2">Keywords</h3>
 											<div className="flex flex-wrap gap-2">
-												{(Array.isArray(summery.keywords) ? summery.keywords : [summery.keywords]).map((keyword, index) => (
+												{(Array.isArray(summaryContent.keywords) ? summaryContent.keywords : [summaryContent.keywords]).map((keyword, index) => (
 													<span key={index} className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">{keyword}</span>
 												))}
 											</div>
@@ -508,7 +514,7 @@ const Summarizer = () => {
 						</div>
 					</div>
 
-					{isChatOpen && <AskAI setChatOpen={setChatOpen} />}
+					{isChatOpen && <AskAI setChatOpen={setChatOpen} contendID={summery?.contentId} />}
 				</div>
 			</div>
 		</>

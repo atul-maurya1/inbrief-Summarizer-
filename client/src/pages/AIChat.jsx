@@ -3,12 +3,14 @@ import logo from "../assets/logo.png";
 import ProfilePic from "../components/ProfilePic";
 import { BsSendFill } from "react-icons/bs";
 import { LuBotMessageSquare } from "react-icons/lu";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const AIChat = () => {
 	const [input, setInput] = useState("");
 	const [messages, setMessages] = useState([]);
 	const [loading, setLoading] = useState(false)
+    const messagesEndRef = useRef(null);
+
 
 	const handleOnClick = async () => {
 		if (!input.trim()) return;
@@ -30,7 +32,7 @@ const AIChat = () => {
 		setLoading(true)
 		let res
 		try{
-		 res = await axios.post(' http://localhost:8000/api/v1/chat/chat-ai', {
+		 res = await axios.post(' http://localhost:8000/api/v1/ai/chat-ai', {
 			inputMsg: userMessage,
 		
 		})
@@ -60,6 +62,11 @@ const AIChat = () => {
 		}
 	};
 
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({
+			behavior: "smooth",
+		});
+   }, [messages]);
 	
 	return (
 		<div>
@@ -145,6 +152,8 @@ const AIChat = () => {
 							)}
 						</div>
 					))}
+
+					<div ref={messagesEndRef} />
 
 				</div>
 			</div>

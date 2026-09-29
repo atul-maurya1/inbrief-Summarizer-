@@ -7,6 +7,7 @@ import pdfUploader from '../config/cloudinary.config.js'
 import Content from '../models/content.model.js'
 import Summary from '../models/summary.model.js'
 import mongoose from "mongoose"
+import {pdfChunking, textChunking} from '../services/rag/chunk.services.js'
 
 export const summarizeContent  = async (req, res, next) => {    
     try {
@@ -18,7 +19,7 @@ export const summarizeContent  = async (req, res, next) => {
         if (!text && !url && !req.file) { // Check whether ANY input exists
             throw new ApiError(400, "Please provide an input");
         }
-        let response      
+        let response, contentId      
 		if (text) {
 			 console.log("text");
              response =  await textServices(text) 
@@ -33,7 +34,8 @@ export const summarizeContent  = async (req, res, next) => {
               summary: summary._id,
               title: summary.title
               })
-             
+              contentId = content._id
+             await textChunking(text, userId, content._id)
 		}
 	    if (url) { 
 				console.log("url");
@@ -49,7 +51,7 @@ export const summarizeContent  = async (req, res, next) => {
                 summary: summary._id,
                 title: summary.title
               })
-
+               contentId = content._id
               console.log("content : ", content) 
                 
 		}
@@ -60,7 +62,6 @@ export const summarizeContent  = async (req, res, next) => {
                 response = await extractTextFromPdf(res.secure_url )
 
                 const summary = await Summary.create(response)
-                console.log("id is ", summary._id)
          
                 const content = await Content.create({
                 user: userId,
@@ -70,13 +71,14 @@ export const summarizeContent  = async (req, res, next) => {
                 summary: summary._id,
                 title: summary.title
               })
+              contentId = content._id
+            //  await pdfChunking( res?.secure_url,  userId, content._id)
 
 		}
 
             if (req.file.mimetype === "video/mp4") { 
                   console.log(req?.file?.path)
-                  const res = await pdfUploader(req?.file?.path) 
-                   console.log("vedio ", res);
+                 
 			  }
 			}
 
@@ -86,7 +88,7 @@ export const summarizeContent  = async (req, res, next) => {
             // await history.save()
 
         return res.status(200).json(
-             new ApiResponse(200, response, "summary generated suucessfully")
+             new ApiResponse(200, {response, contentId: contentId}, "summary generated suucessfully")
         )
 		
 

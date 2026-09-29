@@ -21,8 +21,7 @@ export const urlService = async (url) => {
      })
 
      const chunks = await splitter.splitText(result.markdown)
-     
-     return await AIsummarizer(chunks) 
+    return await AIsummarizer(chunks) 
     
     }catch(err){
        // console.error("error in url service ", err) 

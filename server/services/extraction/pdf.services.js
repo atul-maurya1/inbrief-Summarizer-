@@ -1,7 +1,6 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import {AIsummarizer} from '../ai/ai.services.js'
 
-
 export const extractTextFromPdf = async (pdfUrl) => {
     try{
       
@@ -26,7 +25,7 @@ export const extractTextFromPdf = async (pdfUrl) => {
              "page": ${doc.metadata.loc.pageNumber}
             `)
         }).join("\n\n");
-
+       
         return await AIsummarizer(cleanDocs)  
     
     }catch(err){

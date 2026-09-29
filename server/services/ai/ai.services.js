@@ -1,7 +1,9 @@
 //import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 // import { ChatOpenAI } from "@langchain/openai";
 
-import { ChatOllama } from "@langchain/ollama";
+// import { ChatOllama } from "@langchain/ollama";
+
+import { ChatOpenRouter } from "@langchain/openrouter";
 
 
 import ApiError from "../../utils/apiError.js"
@@ -25,42 +27,73 @@ export const AIsummarizer = async (chunks) => {
 		const chunkSystemPrompt = `
 		You are an AI content summarization assistant.
 
-		Summarize ONLY the provided section. Determine its type, topic, and context from the content itself.
+		Summarize ONLY the provided section.
 
 		Rules:
 		- Preserve the original meaning and context.
-		- Keep the most important facts, ideas, arguments, events, explanations, conclusions, names, dates, numbers, technical terms, definitions, and important examples.
+		- Keep the most important facts, ideas, arguments, events, explanations,
+		conclusions, names, dates, numbers, technical terms, definitions,
+		and important examples.
 		- Remove repetition, filler, unnecessary wording, and irrelevant details.
 		- Use ONLY information explicitly present in the input.
-		- Do not use external knowledge, add information, infer missing facts, make unsupported conclusions, or predictions.
-		- Do not complete, guess, or interpret incomplete, truncated, unclear, or ambiguous information.
+		- Do not use external knowledge.
+		- Do not add information or infer missing facts.
+		- Do not make unsupported conclusions or predictions.
+		- Do not guess or complete incomplete, truncated, unclear, or ambiguous information.
 		- Keep the summary concise and information-dense.
-		- Return ONLY the structured output required by the schema.
-		`;
 
-		const systemPrompt = `
-			You are an AI content summarization assistant.
+		IMPORTANT:
+		Return ONLY an object with exactly this structure:
 
-			Summarize ONLY the provided input. Determine its topic and purpose from the content itself.
+		{
+		"summary": "string"
+		}
 
-			Rules:
-			- Identify the main topic and purpose.
-			- Generate a concise, accurate summary.
-			- Extract the most important key points and 5 relevant keywords.
-			- Preserve important names, dates, numbers, facts, and technical terms.
-			- Remove repetition, filler, and unnecessary details.
-			- Preserve the original meaning and context.
-			- Use ONLY explicitly provided information.
-			- Do not use external knowledge, add or infer facts, make predictions, or turn implications into confirmed facts.
-			- Ignore incomplete, truncated, unclear, or ambiguous information rather than guessing or completing it.
-			- Return ONLY the structured output required by the schema.
+			The "summary" field MUST be a string.
+			Do NOT create nested objects.
+			Do NOT include type, topic, context, title, keyPoints, or keywords.
 			`;
+			
+		const systemPrompt = `
+				You are an AI content summarization assistant.
 
-			const model = new ChatOllama({
-			  model: "qwen3:1.7b",
-			  temperature: 0,
-			  think: false,
-			}); 
+				Summarize ONLY the provided input.
+
+				Rules:
+				- Identify the main topic and purpose.
+				- Generate a concise and accurate summary.
+				- Extract the most important key points.
+				- Generate exactly 5 relevant keywords.
+				- Preserve important names, dates, numbers, facts, and technical terms.
+				- Remove repetition, filler, and unnecessary details.
+				- Preserve the original meaning and context.
+				- Use ONLY explicitly provided information.
+				- Do not use external knowledge.
+				- Do not add or infer facts.
+				- Do not make predictions.
+				- Do not turn implications into confirmed facts.
+				- Ignore incomplete, truncated, unclear, or ambiguous information rather than guessing.
+				- Return ONLY the structured output required by the schema.
+
+				The output must contain:
+				- title: string
+				- summary: string
+				- keyPoints: array of strings
+				- keywords: array of exactly 5 strings
+				`;
+
+			// const model = new ChatOllama({
+			//   model: "qwen3:1.7b",
+			//   temperature: 0,
+			//   think: false,
+			// }); 
+
+			const model = new ChatOpenRouter({
+				model: "nvidia/nemotron-3.5-lightning:free",
+				temperature: 0,
+				
+			});
+
 
 		const structuredModel = model.withStructuredOutput(summarySchema);
 		const chunkStructuredModel = model.withStructuredOutput(chunkSchema)
@@ -82,13 +115,13 @@ export const AIsummarizer = async (chunks) => {
 		  const chunkSummaries = [];
 
     	  // batch processing
-		const CONCURRENCY = 5;
+		const CONCURRENCY = 2;
 		for(let i = 0; i < chunks.length; i += CONCURRENCY){
 			const batch = chunks.slice(i, i + CONCURRENCY);
 			
 			// 5 chunks process in parallel
 			const results = await Promise.all(
-				batch.map((chunk) => chunkStructuredModel.invoke([
+				batch.map(async (chunk, index) => chunkStructuredModel.invoke([
 			{
 				role: "system",
 				content: chunkSystemPrompt,
@@ -100,7 +133,13 @@ export const AIsummarizer = async (chunks) => {
 		]))
 			)
 
-		chunkSummaries.push(...results.map(result  =>  result.summary));
+		console.log(`Chunk result:`, results);
+
+		chunkSummaries.push(
+			...results
+				.filter(result => result && typeof result.summary === "string")
+				.map(result => result.summary)
+		);
 
 		}
 		  
@@ -124,7 +163,7 @@ export const AIsummarizer = async (chunks) => {
 		//console.error("error while model-running ", err);
 		  if (err.status === 429) {
 			//throw new ApiError(429, "Model rate limit reached. Please retry.")
-             return "Groq Model rate limit reached. Please retry after some time.";
+             return "Model rate limit reached. Please retry after some time.";
     }
 		 throw err;
 	} 

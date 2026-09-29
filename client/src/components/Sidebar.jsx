@@ -98,7 +98,7 @@ const SideBar = ({ onClose }) => {
 						<h2 className="mb-3 pt-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
 							History
 						</h2>
-						<ul className="space-y-1.5 text-sm text-slate-600">
+						<ul className="space-y-1.5 text-sm text-slate-600 h-68  overflow-y-auto">
 							{history.length === 0 ? (
 								<li className="rounded-lg border border-dashed border-slate-200 px-1 py-5 text-center text-xs leading-relaxed text-slate-400">
 									Your saved summaries will appear here.

@@ -1,7 +1,6 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { AIsummarizer } from "../ai/ai.services.js"
 
- 
 
 const textServices = async (text) => {
     try{    
@@ -11,7 +10,9 @@ const textServices = async (text) => {
      });
                  
     const chunks = await splitter.splitText(text);
-     return await AIsummarizer(chunks);
+
+   
+    return await AIsummarizer(chunks);
          
     }catch(err){
 

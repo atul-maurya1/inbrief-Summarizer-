@@ -1,8 +1,9 @@
 import {useState, useEffect, useContext, useRef} from "react"
 
 import {SummeryContext} from './summeryContext.js'
-import {getSummaryApi} from '../api/summery.api.js'
+import {getSummaryApi, askAiApi} from '../api/summery.api.js'
 import {authContext} from './authContext.js'
+
 
 const SummeryContextProvider = ({children}) => {
 
@@ -61,6 +62,16 @@ const SummeryContextProvider = ({children}) => {
 
     }
 
+    const askAI = async (contentId, userQuery) => {
+      try{
+        const res =  await askAiApi(contentId, userQuery)
+        return res
+        }catch(err){
+           console.log(err)
+        }
+    
+    }
+
     return(
         <SummeryContext.Provider value ={{ 
                 summery,
@@ -68,7 +79,8 @@ const SummeryContextProvider = ({children}) => {
                 clearSummary,
                 fetchSummary,
                 loading,
-                error
+                error,
+                askAI
                  }} >
             {children}
         </SummeryContext.Provider>

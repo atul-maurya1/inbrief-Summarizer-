@@ -1,6 +1,56 @@
 import { MdMessage, MdClose, MdSend } from "react-icons/md";
+import { useState, useEffect, useRef , useContext} from "react";
+import {SummeryContext} from '../context/summeryContext.js'
 
-const AskAI = ({ setChatOpen }) => {
+const AskAI = ({ setChatOpen, contendID }) => {
+	const [input, setInput] = useState("");
+	const [messages, setMessages] = useState([]);
+	const [msg, setMsg] = useState([]);
+	const messagesEndRef = useRef(null);
+
+	const { summery, askAI } = useContext(SummeryContext)
+	
+
+	const handleClick = async () => {
+		if (!input.trim()) return;
+
+         if(!contendID){
+			alert("please insert content")
+		 }
+
+		const userQuery = input.trim();
+		
+
+		setMessages((prev) => [
+			...prev,
+			{
+				role: "user",
+				content: userQuery,
+			},
+		]);
+
+		setInput("");
+		console.log("contendID ", contendID)
+		const res = await askAI(contendID, userQuery)
+
+		console.log("bot res ", res)
+
+			setMessages((prev) => [
+				...prev,
+				{
+					role: "bot",
+					content: res?.data
+				},
+			]);
+		
+	};
+
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({
+			behavior: "smooth",
+		});
+	}, [messages]);
+
 	return (
 		<div className="fixed inset-0 z-50">
 			<div className="absolute inset-0 bg-black/40 " />
@@ -53,71 +103,78 @@ const AskAI = ({ setChatOpen }) => {
 				</div>
 
 				{/* Chat Messages */}
-				<div className="flex-1 overflow-y-auto p-5 space-y-5">
-					{/* Welcome Message */}
-					<div className="flex gap-3">
-						<div
-							className="w-8 h-8 shrink-0
-                         rounded-lg
-                         bg-blue-100
-                         text-blue-600
-                         flex items-center justify-center"
-						>
-							<MdMessage size={17} />
-						</div>
-
-						<div
-							className="max-w-[85%]
-																border border-slate-200 bg-white
-                         px-4 py-3
-                         rounded-2xl rounded-tl-sm"
-						>
-							<p className="text-sm text-gray-700 leading-6">Hi! 👋</p>
-
-							<p className="text-sm text-gray-700 leading-6 mt-1">
-								I've analyzed your content. Ask me anything about it.
+				<div className="flex-1 min-w-0 overflow-y-auto p-5 space-y-5">
+					{messages.map((msg, index) =>
+						msg.role === "user" ? (
+						/* User Message */
+						<div key={index} className="flex justify-end min-w-0">
+							<div
+							className="
+								max-w-[80%]
+								min-w-0
+								bg-blue-700
+								text-white
+								px-4 py-3
+								rounded-2xl
+								rounded-tr-sm
+								break-words
+								overflow-wrap-anywhere
+							"
+							>
+							<p className="text-sm leading-6 whitespace-pre-wrap break-words">
+								{msg.content}
 							</p>
+							</div>
 						</div>
-					</div>
-
-					{/* Example User Message */}
-					<div className="flex justify-end">
-						<div
-							className="max-w-[80%]
-																bg-blue-700
-                         text-white
-                         px-4 py-3
-                         rounded-2xl rounded-tr-sm"
-						>
-							<p className="text-sm leading-6">What is this document about?</p>
-						</div>
-					</div>
-
-					{/* Example AI Response */}
-					<div className="flex gap-3">
-						<div
-							className="w-8 h-8 shrink-0
-                         rounded-lg
-                         bg-blue-100
-                         text-blue-600
-                         flex items-center justify-center"
-						>
+						) : (
+						/* Bot Message */
+						<div key={index} className="flex items-start gap-3 min-w-0">
+							{/* Bot Icon */}
+							<div
+							className="
+								w-8 h-8
+								shrink-0
+								rounded-lg
+								bg-blue-100
+								text-blue-600
+								flex items-center justify-center
+							"
+							>
 							<MdMessage size={17} />
-						</div>
+							</div>
 
-						<div
-							className="max-w-[85%]
-																border border-slate-200 bg-white
-                         px-4 py-3
-                         rounded-2xl rounded-tl-sm"
-						>
-							<p className="text-sm text-gray-700 leading-6">
-								This document provides an overview of the topic, including its
-								key concepts, important points, and related information.
+							{/* Bot Message */}
+							<div
+							className="
+								max-w-[85%]
+								min-w-0
+								border
+								border-slate-200
+								bg-white
+								px-4 py-3
+								rounded-2xl
+								rounded-tl-sm
+								break-words
+								overflow-wrap-anywhere
+							"
+							>
+							<p
+								className="
+								text-sm
+								text-gray-700
+								leading-6
+								whitespace-pre-wrap
+								break-words
+								"
+							>
+								{msg.content}
 							</p>
+							</div>
 						</div>
+						)
+					)}
+					<div ref={messagesEndRef} />
 					</div>
-				</div>
 
 				{/* Suggested Questions */}
 				<div className="px-4 pb-3">
@@ -173,6 +230,14 @@ const AskAI = ({ setChatOpen }) => {
                        focus-within:ring-blue-500/10"
 					>
 						<textarea
+							onChange={(e) => setInput(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" && !e.shiftKey) {
+								e.preventDefault();
+								handleClick();
+								}
+							 }}
+							value={input}
 							rows="1"
 							placeholder="Ask anything about your content..."
 							className="flex-1
@@ -185,6 +250,7 @@ const AskAI = ({ setChatOpen }) => {
 						/>
 
 						<button
+							onClick={handleClick}
 							className="w-10 h-10 shrink-0
                          rounded-lg
                          bg-blue-600
