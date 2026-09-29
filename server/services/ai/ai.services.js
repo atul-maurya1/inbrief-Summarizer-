@@ -89,7 +89,7 @@ export const AIsummarizer = async (chunks) => {
 			// }); 
 
 			const model = new ChatOpenRouter({
-				model: "nvidia/nemotron-3.5-lightning:free",
+				model: "openrouter/free",
 				temperature: 0,
 				
 			});
@@ -115,7 +115,7 @@ export const AIsummarizer = async (chunks) => {
 		  const chunkSummaries = [];
 
     	  // batch processing
-		const CONCURRENCY = 2;
+		const CONCURRENCY = 5;
 		for(let i = 0; i < chunks.length; i += CONCURRENCY){
 			const batch = chunks.slice(i, i + CONCURRENCY);
 			

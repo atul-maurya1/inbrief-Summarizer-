@@ -31,6 +31,8 @@ export const retrievalChunks = async (contentId, userQuery) => {
         }
     );
 
+    console.log("context ", context)
+
     const SYSTEM_PROMPT = `
         You are InBrief, an AI assistant designed to help users understand and explore their uploaded content.
 

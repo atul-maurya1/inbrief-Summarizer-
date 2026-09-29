@@ -34,8 +34,10 @@ export const summarizeContent  = async (req, res, next) => {
               summary: summary._id,
               title: summary.title
               })
-              contentId = content._id
-             await textChunking(text, userId, content._id)
+             contentId = content._id
+             textChunking(text, userId, content._id).catch(err => {
+                console.log("error while chunking ", err)
+             })
 		}
 	    if (url) { 
 				console.log("url");
@@ -53,7 +55,7 @@ export const summarizeContent  = async (req, res, next) => {
               })
                contentId = content._id
               console.log("content : ", content) 
-                
+              await pdfChunking(url,  userId, content._id)
 		}
 
 		if (req.file) {
@@ -72,7 +74,7 @@ export const summarizeContent  = async (req, res, next) => {
                 title: summary.title
               })
               contentId = content._id
-            //  await pdfChunking( res?.secure_url,  userId, content._id)
+             await pdfChunking( res?.secure_url,  userId, content._id)
 
 		}
 
