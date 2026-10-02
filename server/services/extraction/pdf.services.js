@@ -1,36 +1,41 @@
-import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import {AIsummarizer} from '../ai/ai.services.js'
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
+import { AIsummarizer } from "../ai/ai.services.js"
+import ApiError from "../../utils/apiError.js"
 
 export const extractTextFromPdf = async (pdfUrl) => {
-    try{
-      
-        const response = await fetch(pdfUrl); // Fetch the PDF and response object
+    try {
+        const response = await fetch(pdfUrl)
+        if (!response.ok) {
+            throw new ApiError(502, `Failed to download PDF from storage (${response.status})`)
+        }
 
-        const buffer = await response.arrayBuffer(); //convert response into binary data
+        const buffer = await response.arrayBuffer()
+        const blob = new Blob([buffer], { type: "application/pdf" })
 
-        const blob = new Blob([buffer], { // Take this binary data and package it as a (web-standard) file-like object.
-            type: "application/pdf"  // data represents a PDF.  
-        });
+        const loader = new PDFLoader(blob)
+        const docs = await loader.load()
 
-       const loader = new PDFLoader(blob) // parse the PDF and extract its text.
-       const docs = await loader.load()  // convert into doc
+        if (!docs || docs.length === 0) {
+            throw new ApiError(422, "No readable text found in the PDF. The file may be empty or password-protected.")
+        }
 
-     
+        // Clean text with clean page headings
+        const pageTexts = docs
+            .map((doc, idx) => {
+                const text = doc.pageContent?.trim() 
+                if (!text) return null
+                return `[Page ${idx + 1}]\n${text}`
+            })
+            .filter(Boolean)
 
-       let cleanDocs = []
-       docs.map((doc) => {
-          cleanDocs.push(`
-            "content" ${doc.pageContent}, 
-             "source": ${doc.metadata.source},
-             "page": ${doc.metadata.loc.pageNumber}
-            `)
-        }).join("\n\n");
-       
-        return await AIsummarizer(cleanDocs)  
-    
-    }catch(err){
-       console.log(err)
-        throw err;
+        if (pageTexts.length === 0) {
+            throw new ApiError(422, "PDF text extraction returned empty content.")
+        }
+
+        return await AIsummarizer(pageTexts)
+    } catch (err) {
+        if (err instanceof ApiError) throw err
+        console.error("[PDF Extraction] Error:", err.message || err)
+        throw new ApiError(500, `Failed to extract and summarize PDF: ${err.message || "Unknown error"}`)
     }
-
 }

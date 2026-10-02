@@ -1,4 +1,4 @@
-import axios from 'axios'
+import apiClient from "../api/apiClient";
 import logo from "../assets/logo.png";
 import ProfilePic from "../components/ProfilePic";
 import { BsSendFill } from "react-icons/bs";
@@ -8,12 +8,11 @@ import { useState, useEffect, useRef } from "react";
 const AIChat = () => {
 	const [input, setInput] = useState("");
 	const [messages, setMessages] = useState([]);
-	const [loading, setLoading] = useState(false)
-    const messagesEndRef = useRef(null);
-
+	const [loading, setLoading] = useState(false);
+	const messagesEndRef = useRef(null);
 
 	const handleOnClick = async () => {
-		if (!input.trim()) return;
+		if (!input.trim() || loading) return;
 
 		const userMessage = input.trim();
 
@@ -28,36 +27,40 @@ const AIChat = () => {
 
 		// Clear input
 		setInput("");
+		setLoading(true);
 
-		setLoading(true)
-		let res
-		try{
-		 res = await axios.post(' http://localhost:8000/api/v1/ai/chat-ai', {
-			inputMsg: userMessage,
-		
-		})
-		}catch{
-			setLoading(false)
-		}
-		finally{
-			setLoading(false)
-		}
-		//console.log("res", res.data.data.content)
+		try {
+			const res = await apiClient.post("/ai/chat-ai", {
+				inputMsg: userMessage,
+			});
 
-		// Bot response after 500ms
-	setMessages((prev) => [
+			const botContent = res.data?.data?.content || "No response generated. Please try again.";
+
+			setMessages((prev) => [
 				...prev,
 				{
 					role: "bot",
-					content: res.data.data.content,
+					content: botContent,
 				},
 			]);
-		
+		} catch (err) {
+			console.error("AI Chat error:", err);
+			setMessages((prev) => [
+				...prev,
+				{
+					role: "bot",
+					content: err.response?.data?.message || "Failed to reach AI. Please check your connection and try again.",
+				},
+			]);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	// Send message with Enter key
 	const handleKeyDown = (e) => {
-		if (e.key === "Enter") {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault();
 			handleOnClick();
 		}
 	};
@@ -66,8 +69,8 @@ const AIChat = () => {
 		messagesEndRef.current?.scrollIntoView({
 			behavior: "smooth",
 		});
-   }, [messages]);
-	
+	}, [messages, loading]);
+
 	return (
 		<div>
 			{/* Header */}
@@ -84,7 +87,6 @@ const AIChat = () => {
 			</div>
 
 			{/* Chat Area */}
-           
 			<div className="px-4 py-6 sm:px-6 lg:px-10">
 				<div className="h-145 overflow-y-auto space-y-5 pr-2">
 					{messages.length === 0 && (
@@ -117,9 +119,6 @@ const AIChat = () => {
 							) : (
 								/* Bot Message */
 								<div className="flex items-start gap-3">
-
-									{/* Bot Icon */}
-									
 									<div
 										className={`
 											w-8 h-8 shrink-0
@@ -127,14 +126,12 @@ const AIChat = () => {
 											bg-blue-100
 											text-blue-600
 											flex items-center justify-center
-											${loading ? "animate-pulse scale-110" : ""}
 											transition-transform duration-300
 										`}
 									>
 										<LuBotMessageSquare />
 									</div>
 
-									{/* Bot Response */}
 									<div
 										className="
 											max-w-[80%] sm:max-w-[70%]
@@ -144,7 +141,7 @@ const AIChat = () => {
 											rounded-2xl rounded-tl-sm
 										"
 									>
-										<p className="text-sm leading-6">
+										<p className="text-sm leading-6 whitespace-pre-wrap">
 											{msg.content}
 										</p>
 									</div>
@@ -153,8 +150,23 @@ const AIChat = () => {
 						</div>
 					))}
 
-					<div ref={messagesEndRef} />
+					{/* Loading indicator */}
+					{loading && (
+						<div className="flex items-start gap-3">
+							<div className="w-8 h-8 shrink-0 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center animate-pulse">
+								<LuBotMessageSquare />
+							</div>
+							<div className="border border-slate-200 bg-white px-4 py-3 rounded-2xl rounded-tl-sm">
+								<div className="flex items-center gap-1.5">
+									<span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]" />
+									<span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]" />
+									<span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" />
+								</div>
+							</div>
+						</div>
+					)}
 
+					<div ref={messagesEndRef} />
 				</div>
 			</div>
 
@@ -174,24 +186,6 @@ const AIChat = () => {
 							focus-within:ring-blue-500/10
 						"
 					>
-						{/* Plus Button */}
-						<button
-							type="button"
-							className="
-								w-10 h-10 shrink-0
-								flex items-center justify-center
-								rounded-xl
-								text-gray-500
-								hover:bg-gray-100
-								hover:text-blue-600
-								transition
-							"
-						>
-							<span className="text-3xl font-light text-center">
-								+
-							</span>
-						</button>
-
 						{/* Input */}
 						<input
 							value={input}
@@ -199,6 +193,7 @@ const AIChat = () => {
 							onKeyDown={handleKeyDown}
 							type="text"
 							placeholder="Ask anything..."
+							disabled={loading}
 							className="
 								flex-1
 								min-w-0
@@ -207,6 +202,7 @@ const AIChat = () => {
 								bg-transparent
 								text-sm text-gray-700
 								outline-none
+								disabled:opacity-50
 							"
 						/>
 
@@ -214,6 +210,7 @@ const AIChat = () => {
 						<button
 							onClick={handleOnClick}
 							type="button"
+							disabled={loading || !input.trim()}
 							className="
 								w-10 h-10 shrink-0
 								flex items-center justify-center
@@ -223,6 +220,8 @@ const AIChat = () => {
 								hover:bg-blue-700
 								active:scale-95
 								transition
+								disabled:opacity-50
+								disabled:cursor-not-allowed
 							"
 						>
 							<BsSendFill size={15} />
@@ -238,4 +237,4 @@ const AIChat = () => {
 	);
 };
 
-export default AIChat 
+export default AIChat;

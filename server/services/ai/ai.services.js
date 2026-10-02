@@ -1,170 +1,112 @@
-//import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-// import { ChatOpenAI } from "@langchain/openai";
-
-// import { ChatOllama } from "@langchain/ollama";
-
-import { ChatOpenRouter } from "@langchain/openrouter";
-
-
+import Groq from "groq-sdk"
+import { ChatOpenRouter } from "@langchain/openrouter"
 import ApiError from "../../utils/apiError.js"
-import { ChatGroq } from "@langchain/groq";
-import { z } from "zod";
+import { z } from "zod"
 
+const summarySchema = z.object({
+    title: z.string().default("Document Summary"),
+    summary: z.string().default("No summary generated."),
+    keyPoints: z.array(z.string()).default([]),
+    keywords: z.array(z.string()).default([]),
+})
+
+/**
+ * Summarize content using Groq's fast LLM (128k context window).
+ * Automatically handles large multi-page documents, single texts, or transcripts.
+ *
+ * @param {string[]} chunks - Array of text sections/pages
+ * @returns {Promise<{ title: string, summary: string, keyPoints: string[], keywords: string[] }>}
+ */
 export const AIsummarizer = async (chunks) => {
-	try {
-	
-		const summarySchema = z.object({
-			title: z.string(),
-			summary: z.string(),
-			keyPoints: z.array(z.string()),
-			keywords: z.array(z.string()),
-		});
-
-		const chunkSchema = z.object({
-			summary: z.string(),
-		});
-
-		const chunkSystemPrompt = `
-		You are an AI content summarization assistant.
-
-		Summarize ONLY the provided section.
-
-		Rules:
-		- Preserve the original meaning and context.
-		- Keep the most important facts, ideas, arguments, events, explanations,
-		conclusions, names, dates, numbers, technical terms, definitions,
-		and important examples.
-		- Remove repetition, filler, unnecessary wording, and irrelevant details.
-		- Use ONLY information explicitly present in the input.
-		- Do not use external knowledge.
-		- Do not add information or infer missing facts.
-		- Do not make unsupported conclusions or predictions.
-		- Do not guess or complete incomplete, truncated, unclear, or ambiguous information.
-		- Keep the summary concise and information-dense.
-
-		IMPORTANT:
-		Return ONLY an object with exactly this structure:
-
-		{
-		"summary": "string"
-		}
-
-			The "summary" field MUST be a string.
-			Do NOT create nested objects.
-			Do NOT include type, topic, context, title, keyPoints, or keywords.
-			`;
-			
-		const systemPrompt = `
-				You are an AI content summarization assistant.
-
-				Summarize ONLY the provided input.
-
-				Rules:
-				- Identify the main topic and purpose.
-				- Generate a concise and accurate summary.
-				- Extract the most important key points.
-				- Generate exactly 5 relevant keywords.
-				- Preserve important names, dates, numbers, facts, and technical terms.
-				- Remove repetition, filler, and unnecessary details.
-				- Preserve the original meaning and context.
-				- Use ONLY explicitly provided information.
-				- Do not use external knowledge.
-				- Do not add or infer facts.
-				- Do not make predictions.
-				- Do not turn implications into confirmed facts.
-				- Ignore incomplete, truncated, unclear, or ambiguous information rather than guessing.
-				- Return ONLY the structured output required by the schema.
-
-				The output must contain:
-				- title: string
-				- summary: string
-				- keyPoints: array of strings
-				- keywords: array of exactly 5 strings
-				`;
-
-			// const model = new ChatOllama({
-			//   model: "qwen3:1.7b",
-			//   temperature: 0,
-			//   think: false,
-			// }); 
-
-			const model = new ChatOpenRouter({
-				model: "openrouter/free",
-				temperature: 0,
-				
-			});
-
-
-		const structuredModel = model.withStructuredOutput(summarySchema);
-		const chunkStructuredModel = model.withStructuredOutput(chunkSchema)
-
-		let finalSummery
-		if(chunks.length === 1){
-		    finalSummery =  await structuredModel.invoke([
-			 {
-				role: "system",
-				content: systemPrompt,
-			 },
-			 {
-				role: "user",
-				content: chunks[0],
-			 },
-		]); 
-
-		}else{	
-		  const chunkSummaries = [];
-
-    	  // batch processing
-		const CONCURRENCY = 5;
-		for(let i = 0; i < chunks.length; i += CONCURRENCY){
-			const batch = chunks.slice(i, i + CONCURRENCY);
-			
-			// 5 chunks process in parallel
-			const results = await Promise.all(
-				batch.map(async (chunk, index) => chunkStructuredModel.invoke([
-			{
-				role: "system",
-				content: chunkSystemPrompt,
-			},
-			{
-				role: "user",
-				content: chunk,
-			},
-		]))
-			)
-
-		console.log(`Chunk result:`, results);
-
-		chunkSummaries.push(
-			...results
-				.filter(result => result && typeof result.summary === "string")
-				.map(result => result.summary)
-		);
-
-		}
-		  
-		const combinedSummary = chunkSummaries.join("\n\n");
-
-	    finalSummery = await structuredModel.invoke([
-			{
-				role: "system",
-				content: systemPrompt,
-			},
-			{
-				role: "user",
-				content: combinedSummary,
-			},
-		]);
-   }
-
-		return finalSummery;
-
-	} catch (err) {
-		//console.error("error while model-running ", err);
-		  if (err.status === 429) {
-			//throw new ApiError(429, "Model rate limit reached. Please retry.")
-             return "Model rate limit reached. Please retry after some time.";
+    if (!Array.isArray(chunks) || chunks.length === 0) {
+        throw new ApiError(400, "No content provided to summarize")
     }
-		 throw err;
-	} 
-};
+
+    const fullContent = chunks.join("\n\n---\n\n").trim()
+    if (!fullContent) {
+        throw new ApiError(400, "Content to summarize is empty")
+    }
+
+    const systemPrompt = `You are InBrief's elite AI content summarization engine.
+Analyze the provided document or text thoroughly and return a well-structured JSON object.
+
+Strict Rules:
+- Output MUST be a valid JSON object matching this schema:
+  {
+    "title": "Clear, informative document title",
+    "summary": "Dense, comprehensive, multi-paragraph summary preserving core arguments, numbers, names, and conclusions",
+    "keyPoints": ["Key takeaway 1", "Key takeaway 2", ... (minimum 5 key points)],
+    "keywords": ["Keyword1", "Keyword2", "Keyword3", "Keyword4", "Keyword5"]
+  }
+- "title" must be a non-empty string accurately describing the content.
+- "summary" must be thorough, detailed, and directly answer what the content is about.
+- "keyPoints" must have at least 5 meaningful, detailed bullet points.
+- "keywords" must be an array of exactly 5 relevant strings.
+- Never return empty strings or empty arrays.`
+
+    // ── Primary Engine: Groq (ultra-fast, 128k context window) ──────────
+    if (process.env.GROQ_API_KEY) {
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+        const groqModels = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
+
+        for (const model of groqModels) {
+            try {
+                console.log(`[AI Summarizer] Calling Groq with model: ${model} (content length: ${fullContent.length} chars)...`)
+                const t0 = Date.now()
+                const completion = await groq.chat.completions.create({
+                    model,
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: `Please summarize the following document:\n\n${fullContent}` },
+                    ],
+                    response_format: { type: "json_object" },
+                    temperature: 0.1,
+                })
+
+                const rawJson = completion.choices[0]?.message?.content
+                if (rawJson) {
+                    const parsed = JSON.parse(rawJson)
+                    const validated = summarySchema.parse(parsed)
+                    console.log(`[AI Summarizer] ✅ Generated summary using ${model} in ${(Date.now() - t0) / 1000}s`)
+
+                    // Ensure fields are genuinely populated
+                    if (validated.summary && validated.summary.trim().length > 0) {
+                        return {
+                            title: validated.title || "AI-generated summary",
+                            summary: validated.summary,
+                            keyPoints: validated.keyPoints.length > 0 ? validated.keyPoints : ["Comprehensive document analysis complete"],
+                            keywords: validated.keywords.length > 0 ? validated.keywords : ["Summary", "Document", "Overview", "Analysis", "Key Insights"],
+                        }
+                    }
+                }
+            } catch (groqErr) {
+                console.warn(`[AI Summarizer] Groq model ${model} failed:`, groqErr.message || groqErr)
+                // Continue to next Groq model in list
+            }
+        }
+    }
+
+    // ── Fallback Engine: OpenRouter LangChain ────────────────────────────
+    console.log("[AI Summarizer] Falling back to OpenRouter...")
+    try {
+        const fallbackModel = new ChatOpenRouter({
+            model: "openrouter/free",
+            temperature: 0.1,
+            apiKey: process.env.OPENROUTER_API_KEY,
+        })
+        const structuredModel = fallbackModel.withStructuredOutput(summarySchema)
+
+        const finalSummary = await structuredModel.invoke([
+            { role: "system", content: systemPrompt },
+            { role: "user", content: fullContent.slice(0, 15000) }, // Limit for free OpenRouter
+        ])
+
+        if (finalSummary?.summary) {
+            return finalSummary
+        }
+    } catch (openRouterErr) {
+        console.error("[AI Summarizer] OpenRouter fallback error:", openRouterErr.message)
+    }
+
+    throw new ApiError(500, "AI summarization failed across all models. Please try again.")
+}

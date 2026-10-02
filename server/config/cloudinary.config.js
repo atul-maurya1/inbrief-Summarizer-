@@ -1,46 +1,37 @@
-import { v2 as cloudinary } from 'cloudinary';
-import fs from "fs/promises"
+import { v2 as cloudinary } from "cloudinary"
 
-const pdfUploader =  async (pdfLocalPath) => {
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
-    // Configuration
-    cloudinary.config({ 
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET
-    });
-    
+/**
+ * Upload a local file to Cloudinary.
+ *
+ * @param {string} localPath - Local file path
+ * @param {object} [options]  - Extra Cloudinary upload options (e.g. resource_type)
+ * @returns {Promise<import('cloudinary').UploadApiResponse>}
+ */
+const cloudinaryUploader = async (localPath, options = {}) => {
+    if (!localPath) throw new Error("No local file path provided to Cloudinary uploader")
 
-try {
-    // // 1. Determine resource type and format dynamically based on the file extension
-    // const isPdf = pdfLocalPath.toLowerCase().endsWith('.pdf');
-    // const resourceType = isPdf ? 'image' : 'video'; // Cloudinary treats PDFs as 'image'
-    // const format = isPdf ? 'pdf' : 'mp4';
+    const ext = localPath.toLowerCase()
+    const isPdf = ext.endsWith(".pdf")
+    const isVideo = !isPdf
 
-    // 2. Upload to Cloudinary
-    const uploadResult = await cloudinary.uploader.upload(pdfLocalPath, {
-        resource_type: 'image' || 'video', 
-        folder: 'in-brief-files',  
-        format: 'pdf' || 'mp4'     
-    });
-
-    console.log("Upload successful:", uploadResult.secure_url);
-
-    // 3. Safely delete the local temporary file asynchronously
-    await fs.unlink(pdfLocalPath);
-    return uploadResult
-} catch (error) {
-    console.error("Error during upload or file cleanup:", error);
-    
-    try {
-        await fs.unlink(pdfLocalPath);
-    } catch (unlinkErr) {
-        // File might not exist, safe to ignore
+    const defaultOptions = {
+        folder: "in-brief-files",
+        resource_type: isVideo ? "video" : "image",
+        ...(isPdf && { format: "pdf" }),
     }
+
+    const uploadResult = await cloudinary.uploader.upload(localPath, {
+        ...defaultOptions,
+        ...options,
+    })
+
+    return uploadResult
 }
 
-
-}
-
-
-export default pdfUploader
+export default cloudinaryUploader

@@ -1,183 +1,130 @@
 import ApiError from '../utils/apiError.js'
 import ApiResponse from '../utils/apiRespone.js'
 import User from "../models/user.model.js"
-import bcrypt from 'bcrypt'
 
 const cookiesOptions = {
     httpOnly: true,
-    secure: true, // requires https
-    maxAge: 24 * 60 * 60 * 1000, 
-    sameSite: 'lax' // Recommended to prevent CSRF attacks
-
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'strict',
 }
 
-const generateAccessTokenAndRrefreshToken = async(userId) => {
-    try{
+const generateTokens = async (userId) => {
+    try {
         const user = await User.findById(userId)
-        //console.log(user)
-        if(!user){
-            throw new ApiError(404, "User not found")
-        }
+        if (!user) throw new ApiError(404, "User not found")
 
         const refreshToken = await user.generateRefreshToken()
-        const accessToken = await user.generateAccessToken() 
+        const accessToken = await user.generateAccessToken()
 
         user.refreshToken = refreshToken
-        await user.save({ validateBeforeSave: false });
-        
-        return {refreshToken, accessToken}
+        await user.save({ validateBeforeSave: false })
 
-    }catch(err){
-        console.error("error while generating tokens ", err)
+        return { refreshToken, accessToken }
+    } catch (err) {
+        if (err instanceof ApiError) throw err
+        console.error("Error generating tokens:", err)
         throw new ApiError(500, "Internal server error")
     }
-
 }
 
 export const userRegister = async (req, res, next) => {
+    try {
+        const { firstName, lastName, email, password, confirmPassword } = req.body
 
-    try{
-        const {firstName, lastName, email, password, confirmPassword} = req.body
-        if(!firstName || !email || !password || !confirmPassword){
-            return res.status(400).json(
-                new ApiError(400, "All fields are requireds")
-        )
-           
+        if (!firstName || !email || !password || !confirmPassword) {
+            return next(new ApiError(400, "All fields are required"))
         }
 
-        if(password !== confirmPassword){ 
-             return res.status(400).json(
-               new ApiError(400, "password and confirmPassword is not same")
-        )
-            
-        }
-        const isExists = await User.findOne({email})
-        if(isExists){
-            return res.status(400).json({
-            success: false,
-            statusCode: 400,
-            message: "User with this email already exists"
-    });
+        if (password !== confirmPassword) {
+            return next(new ApiError(400, "Password and confirm password do not match"))
         }
 
-        const user = await User.create({
-            firstName,
-            lastName,
-            email,
-            password
-        })
+        const isExists = await User.findOne({ email })
+        if (isExists) {
+            return next(new ApiError(409, "An account with this email already exists"))
+        }
 
-       
+        const user = await User.create({ firstName, lastName, email, password })
+        const { accessToken, refreshToken } = await generateTokens(user._id)
+        const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
-        const {accessToken, refreshToken} = await generateAccessTokenAndRrefreshToken(user._id)
+        res.cookie("accessToken", accessToken, cookiesOptions)
+        res.cookie("refreshToken", refreshToken, cookiesOptions)
 
-         const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
-        
-        res.cookie( "accessToken", accessToken, cookiesOptions)
-        res.cookie( "refreshToken", refreshToken, cookiesOptions)
-
-        res.status(201).json(
-            new ApiResponse(201, loggedInUser, "user register successfully")
+        return res.status(201).json(
+            new ApiResponse(201, loggedInUser, "Account created successfully")
         )
-
-
-    }catch(error){
-         // console.error("Error:", err);
-
-           console.log("STATUS:", error.response?.status);
-    console.log("DATA:", error.response?.data);
-    console.log("MESSAGE:", error.response?.data?.message);
-
-    return res.status(500).json(
-        new ApiError(500, "Internal server error")
-    );
-
+    } catch (err) {
+        return next(err instanceof ApiError ? err : new ApiError(500, "Internal server error"))
     }
-    
-
 }
 
+export const userLogin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body
 
-export const userLogin = async(req, res, next) => {
-    try{
-        const {email , password} = req.body
-        if(!email || !password){
-            throw new ApiError(400, "all fields are required")
+        if (!email || !password) {
+            return next(new ApiError(400, "Email and password are required"))
         }
 
-        const user = await User.findOne({email: email})
-        if(!user){
-            throw new ApiError(400, "email is not register")
+        const user = await User.findOne({ email })
+        if (!user) {
+            return next(new ApiError(401, "Invalid email or password"))
         }
 
         const isPasswordCorrect = await user.comparePassword(password)
-        if(!isPasswordCorrect){
-            throw new ApiError(400, "incorrect Password")
+        if (!isPasswordCorrect) {
+            return next(new ApiError(401, "Invalid email or password"))
         }
 
-        const {accessToken, refreshToken} = await generateAccessTokenAndRrefreshToken(user._id)
-
+        const { accessToken, refreshToken } = await generateTokens(user._id)
         const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
-        
-        res.cookie( "accessToken", accessToken, cookiesOptions)
-        res.cookie( "refreshToken", refreshToken, cookiesOptions)
 
-        res.status(201).json(
-            new ApiResponse(201, loggedInUser, "user register successfully")
+        res.cookie("accessToken", accessToken, cookiesOptions)
+        res.cookie("refreshToken", refreshToken, cookiesOptions)
+
+        return res.status(200).json(
+            new ApiResponse(200, loggedInUser, "Logged in successfully")
         )
-
-
-    }
-    catch(err){
-        console.log("error while user login ", err)
-        if(err instanceof ApiError){
-            next(err)
-        }
-        throw new ApiError(500 ,"Internal server error")
+    } catch (err) {
+        return next(err instanceof ApiError ? err : new ApiError(500, "Internal server error"))
     }
 }
 
-export const userLogout = async(req, res, next) =>{
-    try{
+export const userLogout = async (req, res, next) => {
+    try {
         const user = req.user
-        if(!user){
-             throw new ApiError(401 ,"Unauthorized user")
+        if (!user) {
+            return next(new ApiError(401, "Unauthorized"))
         }
 
-        res.clearCookie( "accessToken", "", cookiesOptions)
-        res.clearCookie( "refreshToken", "", cookiesOptions)
-             
-        res.status(200).json(
-            new ApiResponse(200,  "user logout successfully")
+        // Clear refresh token from DB
+        await User.findByIdAndUpdate(user._id, { $unset: { refreshToken: 1 } }, { new: true })
+
+        const clearOptions = { ...cookiesOptions, maxAge: 0 }
+        res.clearCookie("accessToken", clearOptions)
+        res.clearCookie("refreshToken", clearOptions)
+
+        return res.status(200).json(
+            new ApiResponse(200, null, "Logged out successfully")
         )
-
-    }catch(e){
-         console.log("error while user logout ", err)
-        if(err instanceof ApiError){
-            next(err)
-        }
-        throw new ApiError(500 ,"Internal server error")
+    } catch (err) {
+        return next(err instanceof ApiError ? err : new ApiError(500, "Internal server error"))
     }
-    
 }
 
 export const userProfile = async (req, res, next) => {
-    try{
-         const user = req.user
-         if(!user){
-             throw new ApiError(401 ,"Unauthorized user")
+    try {
+        const user = req.user
+        if (!user) {
+            return next(new ApiError(401, "Unauthorized"))
         }
 
         return res.status(200).json(
-            new ApiResponse(200, user, "user profile fetch successfully")
+            new ApiResponse(200, user, "Profile fetched successfully")
         )
-
-    }catch(err){
-         console.log("error while user profile ", err)
-        if(err instanceof ApiError){
-            next(err)
-        }
-        throw new ApiError(500 ,"Internal server error")
+    } catch (err) {
+        return next(err instanceof ApiError ? err : new ApiError(500, "Internal server error"))
     }
-    
 }

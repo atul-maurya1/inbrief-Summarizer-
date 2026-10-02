@@ -194,7 +194,7 @@ const SideBar = ({ onClose }) => {
 							<ProfilePic />
 							<div className="min-w-0 flex-1">
 								<p className="truncate text-[11px] font-medium uppercase tracking-[0.12em] text-slate-400">
-									{user ? `${user?.data?.userType} PLAN` : ""}
+									{user ? `${user?.userType} PLAN` : ""}
 								</p>
 							</div>
 							<button

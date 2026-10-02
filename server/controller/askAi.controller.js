@@ -7,6 +7,7 @@ export const askAI = async (req, res) => {
     try {
         const { contentId } = req.query;
         const { userQuery } = req.body;
+        const userId = req.user.id
 
         console.log("contentId:", contentId);
         console.log("userQuery:", userQuery);
@@ -34,7 +35,7 @@ export const askAI = async (req, res) => {
             });
        }
 
-    const response =  await retrievalChunks(contentId, userQuery)
+    const response =  await retrievalChunks(contentId, userId, userQuery)
     console.log("response ", response)
     return res.status(200).json(
        new ApiResponse(200, response, "response comes successfully")
